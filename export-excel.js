@@ -203,8 +203,9 @@
     /* FRONT CREW ZONE: Commander Center room on the left */
     z0 = r; zoneHeader('Front Crew Zone (1 Seat)', 'CREW');
     rr0 = r; room(3, 8, 'ห้อง Commander Center');
-    monRow('F', [['MON-F1', 'E', 'ห้อง Commander Center 1A'], null]);
-    seatRow('F', 1, [['1A', 3, 6, 'Commander Center 1A']]);
+    /* seat and Monitor as wide as 6A + 6C (columns 4-7) and lined up with them */
+    monRow('F', [['MON-F1', 'E', 'ห้อง Commander Center 1A', 4, 4], null]);
+    seatRow('F', 1, [['1A', 4, 4, 'Commander Center 1A']]);
     frame(rr0, r - 1, 3, 8);
     zr.F = [z0, r]; cabin(z0 + 1, r); gapRow(); r++;
 
@@ -229,8 +230,9 @@
     /* MIDDLE CREW ZONE: Commander Center room on the right */
     z0 = r; zoneHeader('Middle Crew Zone (1 Seat)', 'CREW');
     rr0 = r; room(14, 19, 'ห้อง Commander Center');
-    monRow('C', [null, ['MON-C1', 'V', 'ห้อง Commander Center 6F']]);
-    seatRow('C', 6, [['6F', 14, 6, 'Commander Center 6F']]);
+    /* seat and Monitor as wide as 7D + 7F (columns 15-18) and lined up with them */
+    monRow('C', [null, ['MON-C1', 'V', 'ห้อง Commander Center 6F', 15, 4]]);
+    seatRow('C', 6, [['6F', 15, 4, 'Commander Center 6F']]);
     frame(rr0, r - 1, 14, 19);
     zr.C = [z0, r]; cabin(z0 + 1, r); gapRow(); r++;
 
