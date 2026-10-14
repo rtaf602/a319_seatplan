@@ -3,5 +3,5 @@
  * ใส่ URL ของชีท "Seat Plan 319 (For Admin)" เท่านั้น
  */
 window.SEATPLAN_CONFIG = {
-  API_URL: ''
+  API_URL: 'https://script.google.com/macros/s/AKfycbwO7LfBy2kqFdftslPtABxS13CxGLV4kJvB9a9t0tC6_dpQlu9s3CWC4cdEdlPLIdxy/exec'
 };
