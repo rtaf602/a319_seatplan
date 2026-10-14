@@ -56,7 +56,7 @@ th:first-child,td:first-child{text-align:left;font-weight:600}
 tr:last-child td{border-bottom:0;font-weight:700}
 td.n{font-family:var(--mono)}
 td.w.nz{background:var(--warn-soft)} td.b.nz{background:var(--bad-soft)}
-th i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+th i,td i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 .sep{border-left:2px solid var(--line)}
 
 .legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted)}
@@ -94,6 +94,7 @@ table.mt{min-width:420px}
 .ovh[data-note]::before{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--ink);border-radius:0 0 3px 3px;pointer-events:none}
 /* OVHD Monitor: a light full-width pill over its seat row, so the overhead screens do not crowd the plan */
 .ovh.bin{width:calc(3 * var(--sw) + 2 * var(--sg));padding:1px 0;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.14em;background:var(--ovh-ok);color:var(--ink)}
+.ovh[data-m="0"],.ovh.bin[data-m="0"]{background:var(--tc,var(--ok));color:#10202b}
 .ovh.bin[data-m="1"]{background:var(--ovh-warn)}
 .ovh.bin[data-m="2"]{background:var(--ovh-bad)}
 .ovh.bin[data-note]::before{left:14px;right:14px}
@@ -228,7 +229,11 @@ dialog.wide[open]{display:flex;flex-direction:column}
     <span><i class="sw" style="background:var(--ok)"></i>ใช้งานได้ปกติ</span>
     <span><i class="sw" style="background:var(--warn)"></i>ขัดข้องแต่ใช้ได้ / Manual ได้ (!)</span>
     <span><i class="sw" style="background:var(--bad)"></i>ใช้งานไม่ได้ (×)</span>
-    <span><i class="sw mon" style="background:var(--ok)"></i>ป้าย Monitor = จอติดผนัง / Pilot Rest · แถบ OVHD = Overhead Monitor เหนือที่นั่ง<span class="nopdf">&nbsp;(ชี้เมาส์ที่ป้ายเพื่อดูชนิดจอ)</span></span>
+    <span>สี Monitor ที่ใช้งานได้ตามชนิดจอ:</span>
+    <span><i class="sw mon" style="background:#9fc5e8"></i>Wall 8"</span>
+    <span><i class="sw mon" style="background:#8ed873"></i>Wall 20"</span>
+    <span><i class="sw mon" style="background:#e0c097"></i>Wall 15"</span>
+    <span><i class="sw mon" style="background:#b4a7d6;border-radius:999px"></i>แถบ OVHD = Overhead 9"<span class="nopdf">&nbsp;(ชี้เมาส์ที่ป้ายเพื่อดูชนิดจอ)</span></span>
     <span><i class="sw" style="background:var(--ok);border-bottom:4px solid var(--ink);box-sizing:border-box"></i>ขีดล่าง = มีหมายเหตุ</span>
     <span class="nopdf"><i class="sw" style="background:var(--ok);outline:2px dashed var(--accent);outline-offset:2px"></i>เส้นประ = แก้ไขแล้ว ยังไม่ SAVE</span>
   </div>
@@ -315,14 +320,15 @@ var COL=['var(--ok)','var(--warn)','var(--bad)'];
    mon = [left monitor, right monitor], L2 + sofa = left seats stacked beside the sofa,
    room = enclosed Commander Center room (right:true puts it on the right side),
    cols = [left column, right column] where each column is a list of 'wall', {mon:id} and [seat ids]. */
-/* Monitor types: p8 = pilot rest, w20 / w15 = wall mounted, b9 = overhead (slim bar in front of the row it serves). */
-var MT={p8:{name:'Pilot Rest Monitor 8 Inch',short:'Pilot Rest Monitor 8"'},w20:{name:'Wall Mounted Monitor 20 Inch',short:'Wall Monitor 20"'},
-        w15:{name:'Wall Mounted Monitor 15 Inch',short:'Wall Monitor 15"'},b9:{name:'Overhead Monitor 9 Inch',short:'OVHD Monitor 9"'}};
-var MT_ORDER=['p8','w20','w15','b9'];
+/* Monitor types: w8 / w20 / w15 = wall mounted, b9 = overhead (slim bar as wide as the seats it serves). */
+/* c = colour of the Monitor label while it works (same colours as the Google Sheet), so each type is easy to tell apart */
+var MT={w8:{name:'Wall Mounted Monitor 8 Inch',short:'Wall Monitor 8"',c:'#9fc5e8'},w20:{name:'Wall Mounted Monitor 20 Inch',short:'Wall Monitor 20"',c:'#8ed873'},
+        w15:{name:'Wall Mounted Monitor 15 Inch',short:'Wall Monitor 15"',c:'#e0c097'},b9:{name:'Overhead Monitor 9 Inch',short:'OVHD Monitor 9"',c:'#b4a7d6'}};
+var MT_ORDER=['w8','w20','w15','b9'];
 var MTYPE={}; // monitor id -> type key
 var ZONES=[
  {key:'F',name:'FRONT CREW ZONE',title:'Front Crew Zone (1 Seat)',tag:'CREW',
-  mons:{'MON-F1':['p8','ห้อง Commander Center 1A']},
+  mons:{'MON-F1':['w8','ห้อง Commander Center 1A']},
   lines:[{room:{name:'ห้อง Commander Center',mon:'MON-F1',seats:['1A']}}]},
  {key:'V',name:'EXECUTIVE LOUNGE',title:'Executive Lounge (2 Seats)',tag:'EXECUTIVE',
   mons:{'MON-V1':['w20','หน้าที่นั่ง 2A'],'MON-V2':['w20','หลังที่นั่ง 3A'],'MON-V3':['w20','หลังโซฟา']},
@@ -336,7 +342,7 @@ var ZONES=[
          {L:['5A'],R:['5D','5F']},
          {mon:['MON-M3','MON-M4']}]},
  {key:'C',name:'MIDDLE CREW ZONE',title:'Middle Crew Zone (1 Seat)',tag:'CREW',
-  mons:{'MON-C1':['p8','ห้อง Commander Center 6F']},
+  mons:{'MON-C1':['w15','ห้อง Commander Center 6F']},
   lines:[{room:{name:'ห้อง Commander Center',mon:'MON-C1',seats:['6F'],right:true}}]},
  {key:'B',name:'BUSINESS CLASS',title:'Business Class (12 Seats)',tag:'BUSINESS',
   mons:{'MON-B1':['w15','หน้าที่นั่ง 6A, 6C'],'MON-B2':['w15','หน้าที่นั่ง 7D, 7F'],'MON-B3':['b9','หน้าที่นั่ง 7A, 7C'],'MON-B4':['b9','หน้าที่นั่ง 8D, 8F'],'MON-B5':['b9','หน้าที่นั่ง 8A, 8C'],'MON-B6':['b9','หน้าที่นั่ง 9D, 9F']},
@@ -376,14 +382,17 @@ function seatBtn(id){
   b.appendChild(el('span','s',named?SEAT_NAME[id]:id));return b;
 }
 function monLabel(id,v){MTYPE[id]=v[0];return MT[v[0]].name+' · '+v[1]}
-function monBtn(id){var bin=MTYPE[id].charAt(0)==='b',b=el('button','ovh'+(bin?' bin':''),bin?'OVHD':'Monitor');b.type='button';b.dataset.id=id;return b}
+function monBtn(id,seats){var bin=MTYPE[id].charAt(0)==='b',b=el('button','ovh'+(bin?' bin':''),bin?'OVHD':'Monitor');b.type='button';b.dataset.id=id;
+  b.style.setProperty('--tc',MT[MTYPE[id]].c);
+  if(bin&&seats)b.style.width='calc('+seats+' * var(--sw) + '+(seats-1)+' * var(--sg))';
+  return b}
 
 function build(){
   var host=$('zones');host.style.display='flex';host.style.flexDirection='column';host.style.gap='16px';
   ZONES.forEach(function(z){
     var sec=el('section','zone'),h=el('header');h.appendChild(el('h2',null,z.title));h.appendChild(el('span',null,z.tag));sec.appendChild(h);
     var box=el('div','rows');
-    z.lines.forEach(function(ln){
+    z.lines.forEach(function(ln,li){
       if(ln.tables){
         var rt=el('div','row');
         ln.tables.forEach(function(w,i){
@@ -435,7 +444,9 @@ function build(){
         ln.mon.forEach(function(id,i){
           if(i)o.appendChild(el('div','aisle'));
           var side=el('div','side');
-          if(id){reg(id,z.key,false,true,monLabel(id,z.mons[id]));side.appendChild(monBtn(id))}
+          if(id){reg(id,z.key,false,true,monLabel(id,z.mons[id]));
+            /* OVHD bar as wide as the seats on this side of the next seat row */
+            var nx=z.lines[li+1],ns=nx&&(i?nx.R:nx.L);side.appendChild(monBtn(id,ns&&ns.length))}
           o.appendChild(side);
         });
         box.appendChild(o);return;
@@ -502,11 +513,11 @@ function summaryHTML(){
 function mtData(){
   var T={};MT_ORDER.forEach(function(k){T[k]={t:0,m:[0,0,0]}});var sum={t:0,m:[0,0,0]};
   Object.keys(ITEMS).forEach(function(id){if(!ITEMS[id].mon)return;var d=get(id),v=T[MTYPE[id]];v.t++;v.m[d.m]++;sum.t++;sum.m[d.m]++});
-  return MT_ORDER.map(function(k){return {name:MT[k].name,v:T[k]}}).concat([{name:'รวม',v:sum}]);
+  return MT_ORDER.map(function(k){return {name:MT[k].name,c:MT[k].c,v:T[k]}}).concat([{name:'รวม',v:sum}]);
 }
 function mtHTML(){
   var h='<thead><tr><th>ชนิด Monitor</th><th>จำนวน</th><th><i style="background:var(--ok)"></i>ใช้งานได้</th><th><i style="background:var(--warn)"></i>เสื่อมสภาพ</th><th><i style="background:var(--bad)"></i>เสีย</th></tr></thead><tbody>';
-  mtData().forEach(function(r){var z=r.v;h+='<tr><td>'+r.name+'</td><td class="n">'+z.t+'</td><td class="n">'+z.m[0]+'</td><td class="n w'+(z.m[1]?' nz':'')+'">'+z.m[1]+'</td><td class="n b'+(z.m[2]?' nz':'')+'">'+z.m[2]+'</td></tr>'});
+  mtData().forEach(function(r){var z=r.v;h+='<tr><td>'+(r.c?'<i style="background:'+r.c+'"></i>':'')+r.name+'</td><td class="n">'+z.t+'</td><td class="n">'+z.m[0]+'</td><td class="n w'+(z.m[1]?' nz':'')+'">'+z.m[1]+'</td><td class="n b'+(z.m[2]?' nz':'')+'">'+z.m[2]+'</td></tr>'});
   return h+'</tbody>';
 }
 function renderSummary(){$('summary').innerHTML=summaryHTML();$('mtsum').innerHTML=mtHTML()}

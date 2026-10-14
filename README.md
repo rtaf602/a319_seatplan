@@ -1,7 +1,7 @@
 # STATUS SEAT PLAN A319 · ตรวจสภาพที่นั่งและ Monitor
 
 หน้าเว็บให้ฝ่ายการช่าง/ฝ่ายสื่อสารบันทึกสภาพที่นั่งและ Monitor ของเครื่อง A319
-(39 ที่นั่ง, Monitor 21 จอ: Pilot Rest Monitor 8 Inch 2 จอ, Wall Mounted Monitor 20 Inch 7 จอ, Wall Mounted Monitor 15 Inch 6 จอ และ Overhead Monitor 9 Inch 6 จอ)
+(39 ที่นั่ง, Monitor 21 จอ: Wall Mounted Monitor 8 Inch 1 จอ, Wall Mounted Monitor 20 Inch 7 จอ, Wall Mounted Monitor 15 Inch 7 จอ และ Overhead Monitor 9 Inch 6 จอ)
 ข้อมูลทุกครั้งที่กด **SAVE** จะบันทึกลง Google Sheet **Seat Plan 319 (For Admin)** โดยตรง
 และเพิ่มบรรทัดในแท็บ **ประวัติการแก้ไข**
 
@@ -19,14 +19,15 @@
 ## ผังที่นั่ง
 | โซน | ที่นั่ง | Monitor |
 |---|---|---|
-| FRONT CREW ZONE | Commander Center 1A (ในห้อง Commander Center) | Pilot Rest ในห้อง 1A |
+| FRONT CREW ZONE | Commander Center 1A (ในห้อง Commander Center) | ในห้อง 1A (8") |
 | EXECUTIVE LOUNGE | 2A, 3A (โซฟาด้านขวา) | หน้า 2A, หลัง 3A, หลังโซฟา (20") |
 | FIRST CLASS | 4A, 4D, 4F, 5A, 5D, 5F | หน้า 4A, หน้า 4D/4F, หลัง 5A, หลัง 5D/5F (20") |
-| MIDDLE CREW ZONE | Commander Center 6F (ในห้อง Commander Center ด้านขวา) | Pilot Rest ในห้อง 6F |
+| MIDDLE CREW ZONE | Commander Center 6F (ในห้อง Commander Center ด้านขวา) | ในห้อง 6F (15") |
 | BUSINESS CLASS | ซ้าย 6A 6C, 7A 7C, 8A 8C / ขวา 7D 7F, 8D 8F, 9D 9F | หน้า 6A/6C, หน้า 7D/7F (15") · OVHD หน้า 7A/7C, 8D/8F, 8A/8C, 9D/9F |
 | Y-CLASS | ซ้าย 9A–C, 10A–C, 11A–C / ขวา 10D–F, 11D–F, 12D 12F (มีผนังกั้นก่อน 11A–C และ 12D/12F) | หน้า 9A–C, 10D–F, 11A–C, 12D/12F (15") · OVHD หน้า 10A–C, 11D–F |
 
-ในผังบนหน้าเว็บ: **Monitor** = จอติดผนังหรือ Pilot Rest, แถบบาง **OVHD** = Overhead Monitor 9 นิ้ว (ชี้เมาส์ที่ป้ายจอเพื่อดูชนิดจอ)
+สีป้ายจอตามชนิด (เหมือนกันทั้งหน้าเว็บ, PDF, Google Sheet และ Excel): ฟ้า = Wall Mounted 8", เขียวอ่อน = Wall Mounted 20", น้ำตาลอ่อน = Wall Mounted 15", ม่วง = Overhead 9"
+บนหน้าเว็บ แถบบาง **OVHD** กว้างเท่ากับที่นั่งที่จอนั้นอยู่ด้านหน้า (ชี้เมาส์ที่ป้ายจอเพื่อดูชนิดจอ)
 
 ## การติดตั้ง (ทำครั้งเดียว)
 

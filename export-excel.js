@@ -20,13 +20,14 @@
     OVHD: 'FFB4A7D6', FURN: 'FFD9D9D9' };
   var ZN = { F: 'FRONT CREW ZONE', V: 'EXECUTIVE LOUNGE', M: 'FIRST CLASS', C: 'MIDDLE CREW ZONE', B: 'BUSINESS CLASS', Y: 'Y-CLASS' };
   var ZKEYS = ['F', 'V', 'M', 'C', 'B', 'Y'];
-  /* Monitor types: P = pilot rest 8", W = wall 20", V = wall 15", R = overhead 9" */
-  var TKEYS = ['P', 'W', 'V', 'R'];
-  var MTYPE = { P: 'Pilot Rest Monitor', W: 'Wall Monitor 20 Inch', V: 'Wall Monitor 15 Inch', R: 'OVHD Monitor' }; /* short name, also the type column in the list tab */
-  var MTYPE_CELL = { P: 'Pilot Rest 8"', W: 'Monitor 20"', V: 'Monitor 15"', R: 'OVHD 9"' }; /* label on the plan, with screen size */
-  var MTYPE_FULL = { P: 'Pilot Rest Monitor 8 Inch', W: 'Wall Mounted Monitor 20 Inch', V: 'Wall Mounted Monitor 15 Inch', R: 'Overhead Monitor 9 Inch' };
+  /* Monitor types: E = wall 8", W = wall 20", V = wall 15", R = overhead 9" */
+  var TKEYS = ['E', 'W', 'V', 'R'];
+  var MTYPE = { E: 'Wall Monitor 8 Inch', W: 'Wall Monitor 20 Inch', V: 'Wall Monitor 15 Inch', R: 'OVHD Monitor' }; /* short name, also the type column in the list tab */
+  var MTYPE_CELL = { E: 'Monitor 8"', W: 'Monitor 20"', V: 'Monitor 15"', R: 'OVHD 9"' }; /* label on the plan, with screen size */
+  var MTYPE_FULL = { E: 'Wall Mounted Monitor 8 Inch', W: 'Wall Mounted Monitor 20 Inch', V: 'Wall Mounted Monitor 15 Inch', R: 'Overhead Monitor 9 Inch' };
+  var MTYPE_FILL = { E: 'FF9FC5E8', W: 'FF8ED873', V: 'FFE0C097', R: 'FFB4A7D6' }; /* one colour per type (same as the web page) */
   var LIST = 'ทุกที่นั่ง และ Monitor';
-  var HOWTO = 'เลือกสภาพจาก dropdown ใต้ชื่อที่นั่งและใต้ป้าย Monitor · พิมพ์รายละเอียดในช่อง NOTE · สีและตารางสรุปเปลี่ยนเอง · Pilot Rest 8" = จอในห้อง Commander Center, Monitor 20" / 15" = จอติดผนัง, OVHD 9" = Overhead Monitor เหนือที่นั่ง';
+  var HOWTO = 'เลือกสภาพจาก dropdown ใต้ชื่อที่นั่งและใต้ป้าย Monitor · พิมพ์รายละเอียดในช่อง NOTE · สีและตารางสรุปเปลี่ยนเอง · สีป้ายจอตามชนิด: ฟ้า = Monitor 8", เขียว = Monitor 20", น้ำตาลอ่อน = Monitor 15", ม่วง = OVHD 9" (Overhead Monitor เหนือที่นั่ง)';
   var FONT = 'Tahoma';
   var CENTER = { horizontal: 'center', vertical: 'middle', wrapText: true };
   var thin = { style: 'thin', color: { argb: 'FF000000' } };
@@ -161,16 +162,16 @@
       small(r + 2, 2, 'NOTE');
       r += 3;
     }
-    /* monitors: [left, right], each null or [id, type 'W'|'R', position text, first column (optional)]
+    /* monitors: [left, right], each null or [id, type 'E'|'W'|'V'|'R', position text, first column (optional), width in columns (optional, default 4)]
      * the 4-column Monitor cell sits centred over the seats it serves */
     function monRow(zone, pair) {
       pair.forEach(function (m, i) {
         if (!m) return;
-        var c = m[3] || (i ? MON_R : MON_L), a = col(c), id = m[0], label = MTYPE[m[1]] + ' ' + m[2];
-        put(r, c, MTYPE_CELL[m[1]], { span: 4, font: font({ size: 7, bold: true }), fill: m[1] === 'R' ? C.OVHD : C.MGREEN });
-        put(r + 1, c, M[0], { span: 4, font: font({ size: 7 }), fill: C.WHITE }); dv(a + (r + 1), M);
-        put(r + 2, c, null, { span: 4, font: font({ size: 7 }), fill: C.WHITE, align: { wrapText: true, vertical: 'top', horizontal: 'left' } });
-        statusColor(a + r + ':' + col(c + 3) + r, '$' + a + '$' + (r + 1), M);
+        var c = m[3] || (i ? MON_R : MON_L), w = m[4] || 4, a = col(c), id = m[0], label = MTYPE[m[1]] + ' ' + m[2];
+        put(r, c, MTYPE_CELL[m[1]], { span: w, font: font({ size: 7, bold: true }), fill: MTYPE_FILL[m[1]] });
+        put(r + 1, c, M[0], { span: w, font: font({ size: 7 }), fill: C.WHITE }); dv(a + (r + 1), M);
+        put(r + 2, c, null, { span: w, font: font({ size: 7 }), fill: C.WHITE, align: { wrapText: true, vertical: 'top', horizontal: 'left' } });
+        statusColor(a + r + ':' + col(c + w - 1) + r, '$' + a + '$' + (r + 1), M);
         cells[id] = { zone: zone, kind: 'mon', type: m[1], label: label, seat: null, mon: a + (r + 1), note: a + (r + 2) };
         order.push(id);
       });
@@ -202,33 +203,33 @@
     /* FRONT CREW ZONE: Commander Center room on the left */
     z0 = r; zoneHeader('Front Crew Zone (1 Seat)', 'CREW');
     rr0 = r; room(3, 8, 'ห้อง Commander Center');
-    monRow('F', [['MON-F1', 'P', 'ห้อง Commander Center 1A'], null]);
+    monRow('F', [['MON-F1', 'E', 'ห้อง Commander Center 1A'], null]);
     seatRow('F', 1, [['1A', 3, 6, 'Commander Center 1A']]);
     frame(rr0, r - 1, 3, 8);
     zr.F = [z0, r]; cabin(z0 + 1, r); gapRow(); r++;
 
     /* EXECUTIVE LOUNGE: 2A and 3A on the left, sofa on the right */
     z0 = r; zoneHeader('Executive Lounge (2 Seats)', 'EXECUTIVE');
-    monRow('V', [['MON-V1', 'W', 'หน้าที่นั่ง 2A'], null]);
+    monRow('V', [['MON-V1', 'W', 'หน้าที่นั่ง 2A', COLS.B, 2], null]);
     var sofa0 = r;
     seatRow('V', 2, [['2A', COLS.B]]); gapRow();
     seatRow('V', 3, [['3A', COLS.B]]);
     furniture(sofa0, 14, r - sofa0, 6, 'SOFA');
-    monRow('V', [['MON-V2', 'W', 'หลังที่นั่ง 3A'], ['MON-V3', 'W', 'หลังโซฟา']]);
+    monRow('V', [['MON-V2', 'W', 'หลังที่นั่ง 3A', COLS.B, 2], ['MON-V3', 'W', 'หลังโซฟา', 16, 2]]);
     zr.V = [z0, r]; cabin(z0 + 1, r); gapRow(); r++;
 
     /* FIRST CLASS: 4A/5A on the left, 4D 4F / 5D 5F on the right */
     z0 = r; zoneHeader('First Class (6 Seats)', 'FIRST');
-    monRow('M', [['MON-M1', 'W', 'หน้าที่นั่ง 4A'], ['MON-M2', 'W', 'หน้าที่นั่ง 4D, 4F']]);
+    monRow('M', [['MON-M1', 'W', 'หน้าที่นั่ง 4A', COLS.B, 2], ['MON-M2', 'W', 'หน้าที่นั่ง 4D, 4F', 15, 4]]);
     seatRow('M', 4, [['4A', COLS.B], ['4D', 15], ['4F', 17]]); gapRow();
     seatRow('M', 5, [['5A', COLS.B], ['5D', 15], ['5F', 17]]);
-    monRow('M', [['MON-M3', 'W', 'หลังที่นั่ง 5A'], ['MON-M4', 'W', 'หลังที่นั่ง 5D, 5F']]);
+    monRow('M', [['MON-M3', 'W', 'หลังที่นั่ง 5A', COLS.B, 2], ['MON-M4', 'W', 'หลังที่นั่ง 5D, 5F', 15, 4]]);
     zr.M = [z0, r]; cabin(z0 + 1, r); gapRow(); r++;
 
     /* MIDDLE CREW ZONE: Commander Center room on the right */
     z0 = r; zoneHeader('Middle Crew Zone (1 Seat)', 'CREW');
     rr0 = r; room(14, 19, 'ห้อง Commander Center');
-    monRow('C', [null, ['MON-C1', 'P', 'ห้อง Commander Center 6F']]);
+    monRow('C', [null, ['MON-C1', 'V', 'ห้อง Commander Center 6F']]);
     seatRow('C', 6, [['6F', 14, 6, 'Commander Center 6F']]);
     frame(rr0, r - 1, 14, 19);
     zr.C = [z0, r]; cabin(z0 + 1, r); gapRow(); r++;
@@ -288,7 +289,7 @@
     /* summary by Monitor type */
     TKEYS.forEach(function (k, i) {
       var row = TYP0 + 1 + i, n = cnt(function (it) { return it.type === k; });
-      put(row, 2, MTYPE_FULL[k], { span: 9, font: font({ size: 8, bold: true }), align: { vertical: 'middle', wrapText: true } });
+      put(row, 2, MTYPE_FULL[k], { span: 9, font: font({ size: 8, bold: true }), fill: MTYPE_FILL[k], align: { vertical: 'middle', wrapText: true } });
       put(row, 11, { formula: 'M' + row + '+O' + row + '+Q' + row, result: n.mt }, { fill: C.BLUE });
       M.forEach(function (t, j) { put(row, 13 + 2 * j, { formula: 'COUNTIFS(' + q + '$B:$B,"' + MTYPE[k] + '",' + q + '$E:$E,"' + t + '")', result: n.m[j] }, { fill: [C.MGREEN, C.YEL, C.RED][j] }); });
       ws.getRow(row).height = 24;
