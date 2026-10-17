@@ -220,7 +220,7 @@ dialog.wide[open]{display:flex;flex-direction:column}
 .op1 .hz{border:1px solid var(--line);background:var(--cabin);border-radius:6px;padding:5px 6px 6px;display:flex;flex-direction:column;gap:3px}
 .op1 .hz header{display:flex;justify-content:space-between;align-items:center;gap:6px}
 .op1 .hz h2{font-size:11px;margin:0;white-space:nowrap}
-.op1 .hz header span{font-family:var(--mono);font-size:7.5px;font-weight:600;background:var(--accent);color:var(--accent-ink);padding:1px 4px;border-radius:3px;white-space:nowrap}
+.op1 .hz header .hz2 span{font-family:var(--mono);font-size:7.5px;font-weight:600;background:var(--accent);color:var(--accent-ink);padding:1px 4px;border-radius:3px;white-space:nowrap}
 .op1 .hg{display:grid;column-gap:4px;row-gap:0;align-items:center;justify-items:center;margin:0 auto}
 .op1 .hno{font-family:var(--mono);font-weight:600;font-size:10px;color:var(--rowno);height:14px;line-height:14px}
 .op1 .hband{height:calc(3 * var(--hw) + 2 * var(--hg));display:flex;flex-direction:column;justify-content:center;align-items:center;gap:var(--hg)}
@@ -237,9 +237,13 @@ dialog.wide[open]{display:flex;flex-direction:column}
 .op1 .hroomname.up{align-self:end}
 .op1 .hs.cc{font-family:var(--sans);font-size:8px;line-height:1.05;white-space:normal;text-align:center}
 /* A319 has six zones: narrower seats and wrapping zone titles so the whole cabin fits the page width */
-.op1 .hmap{--hw:28px;gap:6px}
+.op1 .hmap{--hw:40px;gap:14px}
+.op1 .hmap .hs{font-size:11px}
 .op1 .hz header{flex-wrap:wrap;align-items:flex-start;row-gap:2px}
-.op1 .hz h2{white-space:normal;font-size:10.5px;line-height:1.2}
+.op1 .hz h2{white-space:nowrap;font-size:10.5px;line-height:1.2}
+.op1 .hz header{flex-direction:column;align-items:stretch;justify-content:flex-start;gap:1px;height:30px}
+.op1 .hz .hz2{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.op1 .hz .hz2 small{font-size:9px;font-weight:600;color:var(--muted);white-space:nowrap}
 .op1 .hm[data-m="1"]{background:var(--warn)} .op1 .hm[data-m="2"]{background:var(--bad)}
 .op1 .hm[data-note]::before{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--ink);border-radius:0 0 4px 4px}
 .op1 .htbl{width:var(--hw);height:calc(2 * var(--hw) + var(--hg));border:1.5px dashed var(--muted);border-radius:4px;background:var(--panel);color:var(--muted);font-size:6.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
@@ -943,7 +947,10 @@ function monLen(cols,i,side){
   return 3;
 }
 function hZone(z){
-  var box=el('div','hz'),h=el('header');h.appendChild(el('h2',null,z.title));h.appendChild(el('span',null,z.tag));box.appendChild(h);
+  /* zone name on the first line, seat count on the second, so the small front zones stay narrow */
+  var box=el('div','hz'),h=el('header'),h2=el('h2'),m=z.title.match(/^(.*?)\s*(\(.*\))$/);
+  h2.appendChild(document.createTextNode(m?m[1]:z.title));h.appendChild(h2);
+  var r2=el('div','hz2');r2.appendChild(el('small',null,m?m[2]:''));r2.appendChild(el('span',null,z.tag));h.appendChild(r2);box.appendChild(h);
   var cols=hCols(z),g=el('div','hg'),room=cols.filter(function(c){return c.room})[0];
   g.style.gridTemplateColumns=cols.map(function(c){return c.k==='mon'?'14px':c.k==='wall'?'6px':'var(--hw)'}).join(' ');
   g.style.gridTemplateRows='14px auto '+(room&&room.room==='top'?'21px':'12px')+' auto'+(room&&room.room==='bot'?' 21px':'');
