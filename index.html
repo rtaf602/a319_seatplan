@@ -236,7 +236,12 @@ dialog.wide[open]{display:flex;flex-direction:column}
 .op1 .hwall{width:4px;height:calc(3 * var(--hw) + 2 * var(--hg));border-radius:2px;background:var(--muted);opacity:.7}
 .op1 .hroomname.up{align-self:end}
 /* A319 has six zones: narrower seats and wrapping zone titles so the whole cabin fits the page width */
-.op1 .hmap{--hw:28px;gap:6px}
+.op1 .hmap{--hw:38px;gap:12px}
+.op1 .hmap .hs{font-size:11px}
+/* each zone only as wide as its seats (title wraps), so the small front zones do not crowd the rear ones */
+.op1 .hz{width:min-content;min-width:104px}
+.op1 .hz header{height:46px;align-content:flex-start}
+.op1 .hz .hg{margin:0 auto}
 .op1 .hz header{flex-wrap:wrap;align-items:flex-start;row-gap:2px}
 .op1 .hz h2{white-space:normal;font-size:10.5px;line-height:1.2}
 .op1 .hm[data-m="1"]{background:var(--warn)} .op1 .hm[data-m="2"]{background:var(--bad)}
