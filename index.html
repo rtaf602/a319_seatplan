@@ -235,13 +235,9 @@ dialog.wide[open]{display:flex;flex-direction:column}
 .op1 .hsofa{width:calc(2 * var(--hw) + 4px);height:calc(2 * var(--hw) + var(--hg));border:1.5px dashed var(--muted);border-radius:6px;background:var(--panel);color:var(--muted);font-size:8px;font-weight:700;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;align-self:center;justify-self:center}
 .op1 .hwall{width:4px;height:calc(3 * var(--hw) + 2 * var(--hg));border-radius:2px;background:var(--muted);opacity:.7}
 .op1 .hroomname.up{align-self:end}
+.op1 .hs.cc{font-family:var(--sans);font-size:8px;line-height:1.05;white-space:normal;text-align:center}
 /* A319 has six zones: narrower seats and wrapping zone titles so the whole cabin fits the page width */
-.op1 .hmap{--hw:38px;gap:12px}
-.op1 .hmap .hs{font-size:11px}
-/* each zone only as wide as its seats (title wraps), so the small front zones do not crowd the rear ones */
-.op1 .hz{width:min-content;min-width:104px}
-.op1 .hz header{height:46px;align-content:flex-start}
-.op1 .hz .hg{margin:0 auto}
+.op1 .hmap{--hw:28px;gap:6px}
 .op1 .hz header{flex-wrap:wrap;align-items:flex-start;row-gap:2px}
 .op1 .hz h2{white-space:normal;font-size:10.5px;line-height:1.2}
 .op1 .hm[data-m="1"]{background:var(--warn)} .op1 .hm[data-m="2"]{background:var(--bad)}
@@ -926,16 +922,25 @@ function hCols(z){
   });
   return cols;
 }
-function hCell(ids,k){
+function hCell(ids,k,len){
   var band=el('div','hband');
   if(k==='wall'){band.appendChild(el('div','hwall'));return band}
   ids.forEach(function(id){
     var d=get(id),x;
-    if(k==='mon'){x=el('div','hm t-'+MTYPE[id]);if(d.m)x.dataset.m=d.m}
-    else{x=el('div','hs'+(WIDE[id]?' wide':''),SEAT_NAME[id]?'CC '+id:id);if(d.s)x.dataset.s=d.s}
+    if(k==='mon'){x=el('div','hm t-'+MTYPE[id]);if(d.m)x.dataset.m=d.m;
+      /* a Monitor is as long as the seats (or sofa) it serves on that side, never longer */
+      if(len)x.style.height='calc('+len+' * var(--hw) + '+(len-1)+' * var(--hg) - 4px)'}
+    else{x=el('div','hs'+(SEAT_NAME[id]?' cc':''),SEAT_NAME[id]?'CC '+id:id);if(d.s)x.dataset.s=d.s}
     if(d.note)x.dataset.note='1';band.appendChild(x);
   });
   return band;
+}
+/* seats beside Monitor column i on one side: nearest seat column after it, else before it (the sofa counts as 2 seats) */
+function monLen(cols,i,side){
+  var n=function(c){if(!c||c.k!=='seat')return 0;if(side==='top'&&c.sofa&&!(c.top||[]).length)return 2;return (c[side]||[]).length};
+  for(var j=i+1;j<cols.length;j++){if(cols[j].k==='mon')break;if(n(cols[j]))return n(cols[j])}
+  for(j=i-1;j>=0;j--){if(cols[j].k==='mon')break;if(n(cols[j]))return n(cols[j])}
+  return 3;
 }
 function hZone(z){
   var box=el('div','hz'),h=el('header');h.appendChild(el('h2',null,z.title));h.appendChild(el('span',null,z.tag));box.appendChild(h);
@@ -944,7 +949,7 @@ function hZone(z){
   g.style.gridTemplateRows='14px auto '+(room&&room.room==='top'?'21px':'12px')+' auto'+(room&&room.room==='bot'?' 21px':'');
   cols.forEach(function(c,i){
     var col=i+1,put=function(node,row){node.style.gridColumn=String(col);node.style.gridRow=String(row);g.appendChild(node)};
-    put(el('div','hno',c.no||''),1);put(hCell(c.top||[],c.k),2);put(el('div','haisle'),3);put(hCell(c.bot||[],c.k),4);
+    put(el('div','hno',c.no||''),1);put(hCell(c.top||[],c.k,c.k==='mon'&&monLen(cols,i,'top')),2);put(el('div','haisle'),3);put(hCell(c.bot||[],c.k,c.k==='mon'&&monLen(cols,i,'bot')),4);
   });
   var sc=cols.map(function(c,i){return c.sofa?i+1:0}).filter(Boolean);
   if(sc.length){var so=el('div','hsofa',cols[sc[0]-1].sofa);so.style.gridColumn=sc[0]+' / '+(sc[sc.length-1]+1);so.style.gridRow='2';g.appendChild(so)}
