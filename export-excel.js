@@ -1,6 +1,7 @@
 /* STATUS SEAT PLAN A319 — EXPORT TO EXCEL
- * buildSeatWorkbook(ExcelJS, data) returns an ExcelJS workbook with 4 sheets:
- *   ผังที่นั่ง | รวมข้อขัดข้องคงค้าง | ทุกที่นั่ง และ Monitor | ประวัติการแก้ไข
+ * buildSeatWorkbook(ExcelJS, data) returns an ExcelJS workbook with 5 sheets (แบบ A320-05):
+ *   ผังที่นั่ง (รวม Galley, ห้องน้ำ, ประตู) | Galley และห้องน้ำ | รวมข้อขัดข้องคงค้าง | ทุกที่นั่ง และ Monitor | ประวัติการแก้ไข
+ * data.eq = { GLAYOUT, GALLEYS, LAVS, TYPES, TYPE_ORDER, E } from the web page (same ids as the page: FWD-OVEN-1, LAV-A ...)
  * data = {
  *   state:   { id: {s:0|1|2, m:0|1|2, note:'', by:'', at:ISO} }   id = '1A', '11E', 'MON-Y3' ...
  *   lastSave:{ by, at:ISO } | null,
@@ -17,7 +18,9 @@
   var M = ['จอปกติ', 'จอเสื่อม', 'จอเสีย'];
   var C = { GREEN: 'FF00FF00', MGREEN: 'FF8ED873', YEL: 'FFFFFF00', RED: 'FFFF0000', CABIN: 'FFCAEDFB', ROWNO: 'FF6D9EEB',
     ZONEH: 'FFC1E4F5', TAG: 'FF45B0E1', WHITE: 'FFFFFFFF', BLUE: 'FF00B0F0', GREY: 'FFF2F2F2', MUTED: 'FF566575',
-    OVHD: 'FFB4A7D6', FURN: 'FFD9D9D9' };
+    OVHD: 'FFB4A7D6', FURN: 'FFD9D9D9', GAL: 'FF1EBDD2', LAV: 'FFE6EDFB', HATCH: 'FFE7ECF1', DOOR: 'FFD5DDE6', EXIT: 'FFF8CBAD' };
+  var E = ['ใช้งานได้', 'ใช้งานได้บางส่วน', 'ใช้งานไม่ได้'];
+  var EQSHEET = 'Galley และห้องน้ำ';
   var ZN = { F: 'FRONT CREW ZONE', V: 'EXECUTIVE LOUNGE', M: 'FIRST CLASS', C: 'MIDDLE CREW ZONE', B: 'BUSINESS CLASS', Y: 'Y-CLASS' };
   var ZKEYS = ['F', 'V', 'M', 'C', 'B', 'Y'];
   /* Monitor types: E = wall 8", W = wall 20", V = wall 15", R = overhead 9" */
@@ -27,7 +30,7 @@
   var MTYPE_FULL = { E: 'Wall Mounted Monitor 8 Inch', W: 'Wall Mounted Monitor 20 Inch', V: 'Wall Mounted Monitor 15 Inch', R: 'Overhead Monitor 9 Inch' };
   var MTYPE_FILL = { E: 'FF9FC5E8', W: 'FF8ED873', V: 'FFE0C097', R: 'FFB4A7D6' }; /* one colour per type (same as the web page) */
   var LIST = 'ทุกที่นั่ง และ Monitor';
-  var HOWTO = 'เลือกสภาพจาก dropdown ใต้ชื่อที่นั่งและใต้ป้าย Monitor · พิมพ์รายละเอียดในช่อง NOTE · สีและตารางสรุปเปลี่ยนเอง · สีป้ายจอตามชนิด: ฟ้า = Monitor 8", เขียว = Monitor 20", น้ำตาลอ่อน = Monitor 15", ม่วง = OVHD 9" (Overhead Monitor เหนือที่นั่ง)';
+  var HOWTO = 'เลือกสภาพจาก dropdown ใต้ชื่อที่นั่ง, ใต้ป้าย Monitor, ใต้ชื่ออุปกรณ์ Galley และใต้ชื่อห้องน้ำ · พิมพ์รายละเอียดในช่อง NOTE · สีและตารางสรุปเปลี่ยนเอง · สีป้ายจอตามชนิด: ฟ้า = Monitor 8", เขียว = Monitor 20", น้ำตาลอ่อน = Monitor 15", ม่วง = OVHD 9" · Galley/ห้องน้ำ: ใช้งานได้ / ใช้งานได้บางส่วน / ใช้งานไม่ได้ · ช่องสีเทา = ไม่ได้ตรวจ (Elec. Panel, Sink, Access Panel, S/O Valve)';
   var FONT = 'Tahoma';
   var CENTER = { horizontal: 'center', vertical: 'middle', wrapText: true };
   var thin = { style: 'thin', color: { argb: 'FF000000' } };
@@ -52,6 +55,8 @@
   function buildSeatWorkbook(ExcelJS, data) {
     data = data || {};
     var state = data.state || {};
+    var EQ = data.eq || { GLAYOUT: {}, GALLEYS: {}, LAVS: {}, TYPES: {}, TYPE_ORDER: [] };
+    var isEq = function (it) { return it.kind === 'eq' || it.kind === 'lav'; };
     var wb = new ExcelJS.Workbook();
     wb.creator = 'STATUS SEAT PLAN A319';
     wb.calcProperties = { fullCalcOnLoad: true };
@@ -109,10 +114,15 @@
     put(3, 14, null, { span: 6, fill: C.YEL, fmt: 'dd/mm/yyyy hh:mm' });
     ws.getRow(2).height = 26; ws.getRow(3).height = 26;
     ws.mergeCells('B4:T4');
-    ws.getCell('B4').value = 'บันทึกสภาพที่นั่งและ Monitor · Export จากหน้าเว็บ ' + thText(new Date()) + ' · เวลาทั้งหมดเป็นเวลาประเทศไทย (TH-LT)';
+    ws.getCell('B4').value = 'บันทึกสภาพที่นั่ง, Monitor, Galley และห้องน้ำ · Export จากหน้าเว็บ ' + thText(new Date()) + ' · เวลาทั้งหมดเป็นเวลาประเทศไทย (TH-LT)';
     ws.getCell('B4').font = font({ size: 8, italic: true }); ws.getCell('B4').alignment = CENTER;
 
-    var SUM0 = 5, TYP0 = SUM0 + ZKEYS.length + 2, HOW = TYP0 + TKEYS.length + 2; /* 5, 13, 19 */
+    /* summary tables: by zone, by Monitor type, Galley และห้องน้ำ (3 rows + total) */
+    var SUM0 = 5, TYP0 = SUM0 + ZKEYS.length + 2, EQ0 = TYP0 + TKEYS.length + 2, HOW = EQ0 + 5; /* 5, 13, 19, 24 */
+    [['GALLEY / ห้องน้ำ', 2, 9, null], ['จำนวน', 11, 2, C.BLUE], ['ใช้งานได้', 13, 2, C.GREEN], ['ใช้งานได้\nบางส่วน', 15, 2, C.YEL], ['ใช้งานไม่ได้', 17, 2, C.RED]].forEach(function (h) {
+      put(EQ0, h[1], h[0], { span: h[2], font: font({ size: 8, bold: true }), fill: h[3] });
+    });
+    ws.getRow(EQ0).height = 26;
     [['ZONE', 2, 3, null], ['ที่นั่งรวม', 5, 2, null], ['ใช้งานได้ปกติ', 7, 2, C.GREEN], ['มีข้อขัดข้อง\nแต่ใช้งานได้', 9, 2, C.YEL],
      ['ใช้งานไม่ได้', 11, 2, C.RED], ['Monitor รวม', 13, 2, C.BLUE], ['Monitor\nใช้งานได้', 15, 2, C.MGREEN],
      ['Monitor\nเสื่อมสภาพ', 17, 2, C.YEL], ['Monitor\nเสีย', 19, 2, C.RED]].forEach(function (h) {
@@ -200,8 +210,61 @@
       ws.getCell(r, c0).font = font({ size: 8, bold: true, color: { argb: C.MUTED } }); ws.getCell(r, c0).alignment = CENTER; r++;
     }
 
+    /* ---------- Galley / ห้องน้ำ / ประตู (ยกจาก A320-05): แต่ละรายการ 3 ช่องเรียงลงมา ชื่อ / สภาพ (dropdown) / NOTE ---------- */
+    var NOTEAL = { wrapText: true, vertical: 'top', horizontal: 'left' };
+    function eqItem(id, rr, c, span, rows, text, it, nameFill) {
+      var a = col(c);
+      put(rr, c, text, { span: span, font: font({ size: 6.5, bold: true }), fill: nameFill || C.GREEN });
+      put(rr + 1, c, E[0], { span: span, font: font({ size: 6 }), fill: C.WHITE }); dv(a + (rr + 1), E);
+      put(rr + 2, c, null, { span: span, rows: Math.max(1, rows - 2), font: font({ size: 6 }), fill: C.WHITE, align: NOTEAL });
+      statusColor(a + rr + ':' + col(c + span - 1) + rr, '$' + a + '$' + (rr + 1), E);
+      it.seat = a + (rr + 1); it.mon = null; it.note = a + (rr + 2);
+      cells[id] = it; order.push(id);
+    }
+    /* Galley grid: grid row -> 3 sheet rows; column map per band = xl in GLAYOUT */
+    function galleyGrid(k, c0, c1) {
+      var G = EQ.GLAYOUT[k], GL = EQ.GALLEYS[k]; if (!G) return;
+      ws.mergeCells(r, c0, r, c1); ws.getCell(r, c0).value = GL.name + (GL.code ? ' (' + GL.code + ')' : '') + '  ·  ' + GL.ref;
+      ws.getCell(r, c0).font = font({ size: 9, bold: true }); ws.getCell(r, c0).alignment = CENTER;
+      for (var cc = c0; cc <= c1; cc++) { ws.getCell(r, cc).fill = fill(C.GAL); ws.getCell(r, cc).border = BOX; }
+      ws.getRow(r).height = 16; r++;
+      var base = r, bands = G.bands;
+      G.cells.forEach(function (x) {
+        var B = bands.filter(function (b) { return x.r >= b.r0 && x.r <= b.r1; })[0], xl = B.xl;
+        var first = xl[x.c - 1], last = xl[x.c - 1 + (x.cs || 1) - 1], cs = first[0], span = last[0] + last[1] - cs;
+        var top = base + (x.r - 1) * 3, rows = (x.rs || 1) * 3;
+        if (!x.id) { put(top, cs, x.n || null, { span: span, rows: rows, font: font({ size: 6, italic: true, color: { argb: C.MUTED } }), fill: C.HATCH }); return; }
+        eqItem(k + '-' + x.id, top, cs, span, rows, x.b, { zone: k, kind: 'eq', gal: k, type: x.type, label: GL.name + ' · ' + x.label, short: x.label });
+      });
+      for (var i = 0; i < G.nrows; i++) { ws.getRow(base + 3 * i).height = 22; ws.getRow(base + 3 * i + 1).height = 13; ws.getRow(base + 3 * i + 2).height = 16; }
+      small(base, 2, 'GALLEY', 'middle');
+      r = base + G.nrows * 3;
+    }
+    function lavCell(key, rr, c, span) {
+      var L = EQ.LAVS[key]; if (!L) return;
+      eqItem('LAV-' + key, rr, c, span, 3, L.name, { zone: L.zone, kind: 'lav', label: L.name + ' · ' + L.pos, short: L.name }, C.LAV);
+    }
+    function lavRow(left, right) {   /* [key, column, span] or null */
+      if (left) lavCell(left[0], r, left[1], left[2]);
+      if (right) lavCell(right[0], r, right[1], right[2]);
+      small(r, 2, 'LAV', 'middle');
+      ws.getRow(r).height = 22; ws.getRow(r + 1).height = 14; ws.getRow(r + 2).height = 24; small(r + 2, 2, 'NOTE');
+      r += 3;
+    }
+    function doorBand(code, exit) {
+      var f = exit ? C.EXIT : C.DOOR, lt = exit ? '◀ EMER EXIT L' : '◀ DOOR ' + code + 'L', rt = exit ? 'EMER EXIT R ▶' : 'DOOR ' + code + 'R ▶';
+      put(r, 2, lt, { span: 3, font: font({ size: 8, bold: true }), fill: f });
+      put(r, 17, rt, { span: 4, font: font({ size: 8, bold: true }), fill: f });
+      if (!exit) for (var cc = 5; cc <= 16; cc++) { ws.getCell(r, cc).fill = fill(f); ws.getCell(r, cc).border = { top: { style: 'dashed', color: { argb: C.MUTED } }, bottom: { style: 'dashed', color: { argb: C.MUTED } } }; }
+      ws.getRow(r).height = 16; r++;
+    }
+
     /* FRONT CREW ZONE: Commander Center room on the left */
     z0 = r; zoneHeader('Front Crew Zone (1 Seat)', 'CREW');
+    /* LAV A (ซ้าย กว้างเท่าห้อง Commander Center) + FWD GALLEY (ขวา แนว D-F) อยู่หน้าประตู 1L / 1R */
+    lavCell('A', r + 1, 4, 4);
+    galleyGrid('FWD', 14, 19);
+    gapRow(4); doorBand('1'); gapRow(4);
     rr0 = r; room(3, 8, 'ห้อง Commander Center');
     /* seat and Monitor as wide as 6A + 6C (columns 4-7) and lined up with them */
     monRow('F', [['MON-F1', 'E', 'ห้อง Commander Center 1A', 4, 4], null]);
@@ -225,6 +288,7 @@
     seatRow('M', 4, [['4A', COLS.B], ['4D', 15], ['4F', 17]]); gapRow();
     seatRow('M', 5, [['5A', COLS.B], ['5D', 15], ['5F', 17]]);
     monRow('M', [['MON-M3', 'W', 'หลังที่นั่ง 5A', COLS.B, 2], ['MON-M4', 'W', 'หลังที่นั่ง 5D, 5F', 15, 4]]);
+    gapRow(4); doorBand('', true);
     zr.M = [z0, r]; cabin(z0 + 1, r); gapRow(); r++;
 
     /* MIDDLE CREW ZONE: Commander Center room on the right */
@@ -232,6 +296,7 @@
     rr0 = r; room(14, 19, 'ห้อง Commander Center');
     /* seat and Monitor as wide as 7D + 7F (columns 15-18) and lined up with them */
     monRow('C', [null, ['MON-C1', 'V', 'ห้อง Commander Center 6F', 15, 4]]);
+    lavCell('CV', r, 4, 4);   /* CENTER VIP LAVATORY ซ้ายมือห้อง Commander Center 6F */
     seatRow('C', 6, [['6F', 15, 4, 'Commander Center 6F']]);
     frame(rr0, r - 1, 14, 19);
     zr.C = [z0, r]; cabin(z0 + 1, r); gapRow(); r++;
@@ -255,6 +320,10 @@
     gapRow(4); wall(3, 8); r--; wall(14, 19); gapRow(4);
     monRow('Y', [['MON-Y5', 'V', 'หน้าที่นั่ง 11A, 11B, 11C'], ['MON-Y6', 'V', 'หน้าที่นั่ง 12D, 12F']]);
     seatRow('Y', '11/12', [['11A', COLS.A], ['11B', COLS.B], ['11C', COLS.C], ['12D', 15], ['12F', 17]]);
+    /* หลังแถวสุดท้าย: LAV C (ซ้าย) / LAV D (ขวา), DOOR 4L / 4R, AFT GALLEY เต็มลำ */
+    gapRow(6); lavRow(['C', 3, 6], ['D', 14, 6]);
+    gapRow(4); doorBand('4'); gapRow(4);
+    galleyGrid('AFT', 3, 19);
     zr.Y = [z0, r]; cabin(z0 + 1, r);
     var LAST = r;
 
@@ -263,14 +332,16 @@
       { type: 'cellIs', operator: 'equal', priority: 3, formulae: ['"' + S[1] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.YEL } } } },
       { type: 'cellIs', operator: 'equal', priority: 4, formulae: ['"' + M[1] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.YEL } } } },
       { type: 'cellIs', operator: 'equal', priority: 5, formulae: ['"' + S[2] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.RED } }, font: { color: { argb: 'FFFFFFFF' } } } },
-      { type: 'cellIs', operator: 'equal', priority: 6, formulae: ['"' + M[2] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.RED } }, font: { color: { argb: 'FFFFFFFF' } } } }
+      { type: 'cellIs', operator: 'equal', priority: 6, formulae: ['"' + M[2] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.RED } }, font: { color: { argb: 'FFFFFFFF' } } } },
+      { type: 'cellIs', operator: 'equal', priority: 7, formulae: ['"' + E[1] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.YEL } } } },
+      { type: 'cellIs', operator: 'equal', priority: 8, formulae: ['"' + E[2] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.RED } }, font: { color: { argb: 'FFFFFFFF' } } } }
     ] });
 
     /* summary formulas count the list sheet (with cached results so every viewer shows numbers at once) */
     var q = "'" + LIST + "'!";
     function cnt(pred) {
       var o = { t: 0, s: [0, 0, 0], mt: 0, m: [0, 0, 0] };
-      order.forEach(function (id) { var it = cells[id], d = state[id] || {}; if (!pred(it)) return;
+      order.forEach(function (id) { var it = cells[id], d = state[id] || {}; if (isEq(it) || !pred(it)) return;
         if (it.seat) { o.t++; o.s[d.s | 0]++; } if (it.mon) { o.mt++; o.m[d.m | 0]++; } });
       return o;
     }
@@ -302,16 +373,34 @@
       put(rt2, x[0], { formula: 'SUM(' + col(x[0]) + (TYP0 + 1) + ':' + col(x[0]) + (TYP0 + TKEYS.length) + ')', result: x[2] }, { font: font({ bold: true }), fill: x[1] });
     });
 
+    /* Galley และห้องน้ำ summary on the plan: counts the list in the "Galley และห้องน้ำ" sheet */
+    var qe = "'" + EQSHEET + "'!";
+    function ecnt(pred) { var o = { t: 0, s: [0, 0, 0] }; order.forEach(function (id) { var it = cells[id], d = state[id] || {}; if (!isEq(it) || !pred(it)) return; o.t++; o.s[d.s | 0]++; }); return o; }
+    var eqRowsDef = [['FWD GALLEY', 'B', 'FWD GALLEY', function (it) { return it.gal === 'FWD'; }], ['AFT GALLEY', 'B', 'AFT GALLEY', function (it) { return it.gal === 'AFT'; }],
+      ['LAVATORY (ห้องน้ำ ' + Object.keys(EQ.LAVS).length + ' ห้อง)', 'C', 'LAVATORY', function (it) { return it.kind === 'lav'; }]];
+    eqRowsDef.forEach(function (x, i) {
+      var row = EQ0 + 1 + i, n = ecnt(x[3]), crit = qe + '$' + x[1] + ':$' + x[1] + ',"' + x[2] + '"';
+      put(row, 2, x[0], { span: 9, font: font({ size: 8, bold: true }), fill: i < 2 ? C.GAL : C.LAV, align: { vertical: 'middle' } });
+      put(row, 11, { formula: 'M' + row + '+O' + row + '+Q' + row, result: n.t }, { fill: C.BLUE });
+      E.forEach(function (t, j) { put(row, 13 + 2 * j, { formula: 'COUNTIFS(' + crit + ',' + qe + '$D:$D,"' + t + '")', result: n.s[j] }, { fill: [C.GREEN, C.YEL, C.RED][j] }); });
+    });
+    var et = ecnt(function () { return true; }), rt3 = EQ0 + 4;
+    put(rt3, 2, 'รวม', { span: 9, font: font({ size: 8, bold: true }), align: { vertical: 'middle' } });
+    [[11, C.BLUE, et.t], [13, C.GREEN, et.s[0]], [15, C.YEL, et.s[1]], [17, C.RED, et.s[2]]].forEach(function (x) {
+      put(rt3, x[0], { formula: 'SUM(' + col(x[0]) + (EQ0 + 1) + ':' + col(x[0]) + (EQ0 + 3) + ')', result: x[2] }, { font: font({ bold: true }), fill: x[1] });
+    });
+
     /* current state */
     order.forEach(function (id) {
       var it = cells[id], d = state[id]; if (!d) return;
-      if (it.seat) ws.getCell(it.seat).value = S[d.s | 0];
+      if (isEq(it)) ws.getCell(it.seat).value = E[d.s | 0];
+      else if (it.seat) ws.getCell(it.seat).value = S[d.s | 0];
       if (it.mon) ws.getCell(it.mon).value = M[d.m | 0];
       if (d.note) ws.getCell(it.note).value = d.note;
     });
 
     /* list sheets */
-    var HDR = ['ที่นั่ง / จุด', 'ประเภท', 'โซน', 'สภาพที่นั่ง', 'สภาพ Monitor', 'หมายเหตุ', 'ผู้บันทึกล่าสุด', 'วัน/เวลาล่าสุด (TH-LT)'];
+    var HDR = ['ที่นั่ง / จุด', 'ประเภท', 'โซน / GALLEY', 'สภาพที่นั่ง / อุปกรณ์', 'สภาพ Monitor', 'หมายเหตุ', 'ผู้บันทึกล่าสุด', 'วัน/เวลาล่าสุด (TH-LT)'];
     var WID = [34, 14, 18, 16, 14, 44, 24, 20];
     function statusCF(s, end) {
       if (end < 2) return;
@@ -319,7 +408,9 @@
         { type: 'cellIs', operator: 'equal', priority: 1, formulae: ['"' + S[1] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.YEL } } } },
         { type: 'cellIs', operator: 'equal', priority: 2, formulae: ['"' + M[1] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.YEL } } } },
         { type: 'cellIs', operator: 'equal', priority: 3, formulae: ['"' + S[2] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.RED } }, font: { color: { argb: 'FFFFFFFF' } } } },
-        { type: 'cellIs', operator: 'equal', priority: 4, formulae: ['"' + M[2] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.RED } }, font: { color: { argb: 'FFFFFFFF' } } } }
+        { type: 'cellIs', operator: 'equal', priority: 4, formulae: ['"' + M[2] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.RED } }, font: { color: { argb: 'FFFFFFFF' } } } },
+        { type: 'cellIs', operator: 'equal', priority: 5, formulae: ['"' + E[1] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.YEL } } } },
+        { type: 'cellIs', operator: 'equal', priority: 6, formulae: ['"' + E[2] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.RED } }, font: { color: { argb: 'FFFFFFFF' } } } }
       ] });
     }
     function header(s, titles, widths) {
@@ -334,8 +425,10 @@
       var qm = "'ผังที่นั่ง'!";
       ids.forEach(function (id, i) {
         var row = 2 + i, it = cells[id], d = state[id] || {};
-        var vals = [it.label, it.seat ? 'ที่นั่ง' : MTYPE[it.type], ZN[it.zone]];
-        if (live) {
+        var eqk = isEq(it), vals = [it.label, it.kind === 'eq' ? 'Galley' : it.kind === 'lav' ? 'ห้องน้ำ' : it.seat ? 'ที่นั่ง' : MTYPE[it.type], it.kind === 'eq' ? EQ.GALLEYS[it.gal].name : ZN[it.zone]];
+        if (eqk) {
+          vals.push({ formula: qm + it.seat, result: E[d.s | 0] }, '-', { formula: 'IF(' + qm + it.note + '="",""' + ',' + qm + it.note + ')', result: d.note || '' });
+        } else if (live) {
           vals.push(it.seat ? { formula: qm + it.seat, result: S[d.s | 0] } : '-');
           vals.push(it.mon ? { formula: qm + it.mon, result: M[d.m | 0] } : '-');
           vals.push({ formula: 'IF(' + qm + it.note + '="",""' + ',' + qm + it.note + ')', result: d.note || '' });
@@ -353,10 +446,80 @@
       if (end >= 2) s.autoFilter = 'A1:H' + end;
       return s;
     }
+    /* ---------- แผ่นงาน Galley และห้องน้ำ (แบบ A320-05): ตารางสรุป (COUNTIFS จากรายการด้านล่าง) + รายการที่ดึงสภาพจากผังที่นั่ง ---------- */
+    function galleySheet() {
+      var eqIds = order.filter(function (id) { return isEq(cells[id]); }), MS = "'ผังที่นั่ง'!";
+      var group = function (it) { return it.kind === 'eq' ? EQ.GALLEYS[it.gal].name : ZN[it.zone]; };
+      var lavZ = ZKEYS.filter(function (z) { return eqIds.some(function (id) { var it = cells[id]; return it.kind === 'lav' && it.zone === z; }); });
+      var gals = Object.keys(EQ.GALLEYS).map(function (k) { return { key: k, name: EQ.GALLEYS[k].name, types: EQ.TYPE_ORDER.filter(function (t) { return eqIds.some(function (id) { var it = cells[id]; return it.gal === k && it.type === t; }); }) }; });
+      var g = wb.addWorksheet(EQSHEET, { views: [{ showGridLines: false }], pageSetup: { paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0 } });
+      [34, 18, 22, 18, 40, 22, 20].forEach(function (w, j) { g.getColumn(j + 1).width = w; });
+      function gput(rr, c, v, o) {
+        o = o || {}; var cell = g.getCell(rr, c);
+        if (v !== undefined && v !== null) cell.value = v;
+        cell.font = o.font || font(); cell.alignment = o.align || CENTER; cell.border = BOX;
+        if (o.fill) cell.fill = fill(o.fill); if (o.fmt) cell.numFmt = o.fmt;
+        return cell;
+      }
+      g.mergeCells('A1:G1'); g.getCell('A1').value = 'สถานภาพ Galley และห้องน้ำ (LAVATORY) A319';
+      g.getCell('A1').font = font({ size: 14, bold: true }); g.getCell('A1').alignment = CENTER; g.getCell('A1').fill = fill(C.TAG); g.getRow(1).height = 28;
+      g.mergeCells('A2:G2'); g.getCell('A2').value = 'แก้สภาพ Galley / ห้องน้ำได้ที่แผ่นงาน "ผังที่นั่ง" (dropdown ใต้ชื่ออุปกรณ์) · รายการและตารางสรุปในแผ่นนี้ดึงค่ามาเอง · Export ' + thText(new Date());
+      g.getCell('A2').font = font({ size: 8, italic: true }); g.getCell('A2').alignment = CENTER;
+      var nG = 0; gals.forEach(function (G) { nG += 1 + G.types.length; });
+      var GS = 4, GE = GS + nG + 1, LS = GE + 2, LE = LS + lavZ.length + 1, L0 = LE + 2, L1 = L0 + eqIds.length;
+      var rng = function (c) { return '$' + c + '$' + (L0 + 1) + ':$' + c + '$' + Math.max(L1, L0 + 1); };
+      var rB = rng('B'), rC = rng('C'), rD = rng('D');
+      var qq = function (t) { return '"' + String(t).replace(/"/g, '""') + '"'; };
+      function cnt2(f) { var c = { t: 0, s: [0, 0, 0] }; eqIds.forEach(function (id) { var it = cells[id]; if (!f(it)) return; var d = state[id] || {}; c.t++; c.s[d.s | 0]++; }); return c; }
+      function sumHeader(rr, first) { [first, 'จำนวน', E[0], E[1], E[2]].forEach(function (t, j) { gput(rr, j + 1, t, { font: font({ size: 9, bold: true }), fill: [C.ZONEH, C.ZONEH, C.GREEN, C.YEL, C.RED][j] }); }); g.getRow(rr).height = 22; }
+      function sumRow(rr, name, crit, c, o) {
+        o = o || {};
+        gput(rr, 1, name, { font: font({ bold: !!o.bold }), align: { vertical: 'middle', horizontal: 'left', indent: o.indent ? 2 : 0 }, fill: o.fill });
+        gput(rr, 2, { formula: 'COUNTIFS(' + crit + ')', result: c.t }, { font: font({ bold: !!o.bold }), fill: o.fill });
+        E.forEach(function (t, j) { gput(rr, 3 + j, { formula: 'COUNTIFS(' + crit + ',' + rD + ',' + qq(t) + ')', result: c.s[j] }, { font: font({ bold: !!o.bold }), fill: o.fill }); });
+      }
+      function totRow(rr, rows, c) {
+        gput(rr, 1, 'รวม', { font: font({ bold: true }), align: { vertical: 'middle', horizontal: 'left' }, fill: C.GREY });
+        [c.t, c.s[0], c.s[1], c.s[2]].forEach(function (v, j) { var Lc = col(2 + j); gput(rr, 2 + j, { formula: rows.map(function (x) { return Lc + x; }).join('+') || '0', result: v }, { font: font({ bold: true }), fill: C.GREY }); });
+      }
+      sumHeader(GS, 'GALLEY / อุปกรณ์');
+      var r2 = GS + 1, heads = [];
+      gals.forEach(function (G) {
+        heads.push(r2);
+        sumRow(r2++, G.name, rB + ',' + qq(G.name), cnt2(function (it) { return it.kind === 'eq' && it.gal === G.key; }), { bold: true, fill: C.CABIN });
+        G.types.forEach(function (t) { sumRow(r2++, EQ.TYPES[t], rB + ',' + qq(G.name) + ',' + rC + ',' + qq(EQ.TYPES[t]), cnt2(function (it) { return it.kind === 'eq' && it.gal === G.key && it.type === t; }), { indent: true }); });
+      });
+      totRow(GE, heads, cnt2(function (it) { return it.kind === 'eq'; }));
+      sumHeader(LS, 'ห้องน้ำ (LAVATORY) · ZONE');
+      var lavRows = [];
+      lavZ.forEach(function (z, i) {
+        var rr = LS + 1 + i; lavRows.push(rr);
+        var names = eqIds.filter(function (id) { var it = cells[id]; return it.kind === 'lav' && it.zone === z; }).map(function (id) { return cells[id].short; });
+        sumRow(rr, ZN[z] + ' (' + names.join(', ') + ')', rB + ',' + qq(ZN[z]) + ',' + rC + ',' + qq('LAVATORY'), cnt2(function (it) { return it.kind === 'lav' && it.zone === z; }));
+      });
+      totRow(LE, lavRows, cnt2(function (it) { return it.kind === 'lav'; }));
+      ['รายการ', 'GALLEY / โซน', 'ประเภท', 'สภาพ', 'หมายเหตุ', 'ผู้บันทึกล่าสุด', 'วัน/เวลาล่าสุด (TH-LT)'].forEach(function (t, j) { gput(L0, j + 1, t, { font: font({ size: 9, bold: true }), fill: C.ZONEH }); });
+      g.getRow(L0).height = 22;
+      eqIds.forEach(function (id, i) {
+        var rr = L0 + 1 + i, it = cells[id], d = state[id] || {};
+        [it.label, group(it), it.kind === 'lav' ? 'LAVATORY' : EQ.TYPES[it.type], { formula: MS + it.seat, result: E[d.s | 0] }, { formula: 'IF(' + MS + it.note + '="","",' + MS + it.note + ')', result: d.note || '' }, d.by || '', d.at ? th(d.at) : ''].forEach(function (v, j) {
+          gput(rr, j + 1, v, { align: { horizontal: (j === 0 || j === 4 || j === 5) ? 'left' : 'center', vertical: 'top', wrapText: j === 4 || j === 0 } });
+        });
+        g.getCell(rr, 7).numFmt = 'dd/mm/yyyy hh:mm';
+      });
+      if (eqIds.length) {
+        g.addConditionalFormatting({ ref: 'D' + (L0 + 1) + ':D' + L1, rules: [
+          { type: 'cellIs', operator: 'equal', priority: 1, formulae: ['"' + E[1] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.YEL } } } },
+          { type: 'cellIs', operator: 'equal', priority: 2, formulae: ['"' + E[2] + '"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: C.RED } }, font: { color: { argb: 'FFFFFFFF' } } } }
+        ] });
+        g.autoFilter = 'A' + L0 + ':G' + L1;
+      }
+    }
+    galleySheet();
     var bad = order.filter(function (id) { var d = state[id] || {}; return (d.s | 0) || (d.m | 0) || d.note; });
     var sBad = listSheet('รวมข้อขัดข้องคงค้าง', bad, false);
     if (!bad.length) { sBad.getCell('A2').value = 'ไม่มีข้อขัดข้องคงค้าง'; sBad.getCell('A2').font = font(); }
-    listSheet(LIST, order, true);
+    listSheet(LIST, order.filter(function (id) { return !isEq(cells[id]); }), true);
 
     /* history: every cell centred (horizontal + vertical) */
     var h = wb.addWorksheet('ประวัติการแก้ไข');

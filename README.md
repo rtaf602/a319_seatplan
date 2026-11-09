@@ -1,85 +1,74 @@
-# STATUS SEAT PLAN A319 · ตรวจสภาพที่นั่งและ Monitor
+# STATUS SEAT PLAN A319 · Galley, ห้องน้ำ และประตู (ร่างแบบ A319 SEAT MODIFICATION)
 
-หน้าเว็บให้ฝ่ายการช่าง/ฝ่ายสื่อสารบันทึกสภาพที่นั่งและ Monitor ของเครื่อง A319
-(39 ที่นั่ง, Monitor 21 จอ: Wall Mounted Monitor 8 Inch 1 จอ, Wall Mounted Monitor 20 Inch 7 จอ, Wall Mounted Monitor 15 Inch 7 จอ และ Overhead Monitor 9 Inch 6 จอ)
-ข้อมูลทุกครั้งที่กด **SAVE** จะบันทึกลง Google Sheet **Seat Plan 319 (For Admin)** โดยตรง
-และเพิ่มบรรทัดในแท็บ **ประวัติการแก้ไข**
+หน้าเว็บ STATUS SEAT PLAN A319 (ใช้งานจริง) ที่เพิ่ม **Galley 2 จุด, ห้องน้ำ 4 ห้อง, ประตู และทางออกฉุกเฉิน**
+โดยยกระบบมาจาก [`rtaf602/a320-05_seatplan`](https://github.com/rtaf602/a320-05_seatplan) มาใส่ผังของ [`rtaf602/a319_seatplan`](https://github.com/rtaf602/a319_seatplan)
+**ที่นั่ง 39 ที่ และ Monitor 21 จอเหมือนเดิมทุกจุด** (รหัส ตำแหน่ง ชนิดจอ และสีป้ายจอไม่เปลี่ยน)
 
-- หน้าเว็บ: https://rtaf602.github.io/a319_seatplan/
-- ชีทเก็บข้อมูล: [Seat Plan 319 (For Admin)](https://docs.google.com/spreadsheets/d/1OeYYS-0k1fiS7kpJZvsH5fWSewE3JzJP-Emy39tbC-o/edit)
+> วิธีออกแบบ, โครงสร้างข้อมูล และวิธีนำไปใช้กับเครื่องลำอื่น ดู [`docs/GALLEY_LAV_GUIDE_A319.md`](docs/GALLEY_LAV_GUIDE_A319.md)
+> รายการรหัสทุกรายการ (103 รายการ) และช่องในชีท ดู [`docs/ITEM_IDS.csv`](docs/ITEM_IDS.csv)
+> ภาพตัวอย่างหน้าเว็บและหน้า SUMMARY ดู [`docs/images/`](docs/images/)
+
+## ไฟล์
 
 | ไฟล์ | หน้าที่ |
 |---|---|
-| `index.html` | หน้าเว็บ (ผังที่นั่ง, ตารางสรุปตามโซนและตามชนิด Monitor, ปุ่ม CLEAR / PREVIEW / SAVE / EXPORT TO PDF / EXPORT TO EXCEL) |
-| `export-excel.js` | ผังที่นั่งของชีท และไฟล์ EXPORT TO EXCEL 4 แผ่นงาน: ผังที่นั่ง, รวมข้อขัดข้องคงค้าง, ทุกที่นั่ง และ Monitor, ประวัติการแก้ไข |
-| `config.js` | ใส่ URL ของ Apps Script Web App |
-| `apps-script/Code.gs` | โค้ดที่วางใน Apps Script ของ Google Sheet: สร้างแท็บทั้งหมด (`setupSheet`), อ่าน/บันทึกข้อมูลให้หน้าเว็บ และเก็บประวัติเมื่อแก้ในชีทโดยตรง |
-| `tools/build-code-gs.js` | คัดลอกผังจาก `export-excel.js` ไปไว้ใน `Code.gs` (ใช้เมื่อแก้ผัง) |
+| `index.html` | หน้าเว็บ: ผังที่นั่ง + Monitor + Galley + ห้องน้ำ + ประตู, ปุ่ม CLEAR / PREVIEW / SAVE / EXPORT TO PDF ALL PAGES / EXPORT SUMMARY 4 PAGES / EXPORT TO EXCEL |
+| `export-excel.js` | สร้างไฟล์ EXPORT TO EXCEL 5 แผ่นงาน (แผ่น "ผังที่นั่ง" มี Galley, ห้องน้ำ และประตูด้วย) |
+| `config.js` | `API_URL` ของ Apps Script (ชีท Seat Plan 319) |
+| `apps-script/Code.gs` | วางใน Apps Script ของชีท: สร้างแท็บ (`setupSheet`), API ให้หน้าเว็บ, ประวัติเมื่อแก้ในชีท |
+| `tools/build-code-gs.js` | คัดลอกผังจาก `export-excel.js` และรายการ Galley/ห้องน้ำจาก `index.html` ไปไว้ใน `Code.gs` |
+| `docs/GALLEY_LAV_GUIDE_A319.md` | คู่มือการออกแบบ |
+| `docs/ITEM_IDS.csv` | รหัสทุกรายการ ชนิด โซน/Galley ชื่อ และตำแหน่งช่องในแผ่นงาน "ผังที่นั่ง" |
+| `docs/images/` | ภาพหน้าเว็บทีละโซน และหน้า 1-2 ของ SUMMARY 4 PAGES |
 
-## ผังที่นั่ง
-| โซน | ที่นั่ง | Monitor |
-|---|---|---|
-| FRONT CREW ZONE | Commander Center 1A (ในห้อง Commander Center) | ในห้อง 1A (8") |
-| EXECUTIVE LOUNGE | 2A, 3A (โซฟาด้านขวา) | หน้า 2A, หลัง 3A, หลังโซฟา (20") |
-| FIRST CLASS | 4A, 4D, 4F, 5A, 5D, 5F | หน้า 4A, หน้า 4D/4F, หลัง 5A, หลัง 5D/5F (20") |
-| MIDDLE CREW ZONE | Commander Center 6F (ในห้อง Commander Center ด้านขวา) | ในห้อง 6F (15") |
-| BUSINESS CLASS | ซ้าย 6A 6C, 7A 7C, 8A 8C / ขวา 7D 7F, 8D 8F, 9D 9F | หน้า 6A/6C, หน้า 7D/7F (15") · OVHD หน้า 7A/7C, 8D/8F, 8A/8C, 9D/9F |
-| Y-CLASS | ซ้าย 9A–C, 10A–C, 11A–C / ขวา 10D–F, 11D–F, 12D 12F (มีผนังกั้นก่อน 11A–C และ 12D/12F) | หน้า 9A–C, 10D–F, 11A–C, 12D/12F (15") · OVHD หน้า 10A–C, 11D–F |
+## ผังที่เพิ่ม
 
-สีป้ายจอตามชนิด (เหมือนกันทั้งหน้าเว็บ, PDF, Google Sheet และ Excel): ฟ้า = Wall Mounted 8", เขียวอ่อน = Wall Mounted 20", น้ำตาลอ่อน = Wall Mounted 15", ม่วง = Overhead 9"
-บนหน้าเว็บ แถบบาง **OVHD** กว้างเท่ากับที่นั่งที่จอนั้นอยู่ด้านหน้า (ชี้เมาส์ที่ป้ายจอเพื่อดูชนิดจอ)
+| โซน | Galley / ห้องน้ำ / ประตู |
+|---|---|
+| FRONT CREW ZONE | **LAV A** (ซ้าย กว้างเท่าห้อง Commander Center) + **FWD GALLEY** (ขวา แนว D-F) อยู่หน้าสุด → **DOOR 1L / 1R** → ห้อง Commander Center 1A |
+| FIRST CLASS | **EMER EXIT L / R** หลังแถว 5 |
+| MIDDLE CREW ZONE | **CENTER VIP LAV** ซ้ายมือห้อง Commander Center 6F (กว้างและสูงเท่าห้อง) |
+| Y-CLASS | **LAV C** (ซ้าย) / **LAV D** (ขวา) หลังแถวสุดท้าย → **DOOR 4L / 4R** → **AFT GALLEY** (เต็มลำ) |
 
-## การติดตั้ง (ทำครั้งเดียว)
+- **FWD GALLEY** (คู่มือ A319CJ CAOM 1.02.04 GALLEYS P3) ตรวจ 17 รายการ: KSSU Std Unit 1-2, Oven, Microwave Oven, Coffee Maker, Hot Cup, Work Light, Power Outlet, Stowage, Faucet, Chilled Compartment 1-2, Refrigerator / Freezer, Ice / Cutlery / China Drawer, Chiller
+- **AFT GALLEY** (CAOM 1.02.04 GALLEYS P5/6) ตรวจ 22 รายการ: KSSU Std Unit 1-3, Oven 1-2, Coffee Maker, Hot Jug, Cold Jug, Hot Cup, Faucet, Power Outlet, Stowage 1-3, Misc Stowage, Drawer 1-3, Waste Bin, Trash Compactor, Std FS Trolley 1-2
+- ช่องลายเส้น = ไม่ได้ตรวจ (Elec. Panel, Access Panel, Sink, S/O Valve)
+- สภาพ Galley / ห้องน้ำ 3 ระดับ: **ใช้งานได้ / ใช้งานได้บางส่วน / ใช้งานไม่ได้** (ที่นั่งและ Monitor ใช้ระดับเดิม)
+- Power Outlet แสดงเป็นไอคอนปลั๊ก + **PWR** (ไม่ระบุแรงดัน)
 
-### 1. เปิดหน้าเว็บด้วย GitHub Pages
-1. ใน repo นี้ ไปที่ **Settings > Pages**
-2. Source เลือก **Deploy from a branch**, Branch เลือก **main** และ **/ (root)** แล้วกด Save
-3. รอ 1–2 นาที หน้าเว็บจะอยู่ที่ `https://rtaf602.github.io/a319_seatplan/`
+## ปุ่มและรายงาน (เหมือน A320-05)
 
-### 2. ติดตั้ง Apps Script และสร้างแท็บในชีท
-1. เปิด Google Sheet **Seat Plan 319 (For Admin)** > **ส่วนขยาย (Extensions) > Apps Script**
-2. ลบโค้ดเดิมทั้งหมดใน `Code.gs` แล้ววางโค้ดจาก `apps-script/Code.gs`
-3. ถ้าต้องการรหัส ให้แก้บรรทัดบนสุด:
-   - `WRITE_PIN` รหัสที่ช่างต้องใส่ตอนเปิดหน้าเว็บและก่อน SAVE เช่น `'6020'` (เว้นว่าง = ไม่ต้องใช้รหัส)
-   - `ADMIN_PIN` รหัสสำหรับปุ่ม "ล้างข้อมูลทั้งหมด" บนเว็บ (เว้นว่าง = ไม่แสดงปุ่มนี้)
-4. กด **บันทึก (Save)**
-5. ที่แถบด้านบน เลือกฟังก์ชัน **setupSheet** แล้วกด **Run (เรียกใช้)** กดอนุญาตสิทธิ์ (Authorize access) ด้วยบัญชีเจ้าของชีท
-   รอประมาณ 1 นาที ชีทจะมี 4 แท็บ: **ผังที่นั่ง**, **รวมข้อขัดข้องคงค้าง**, **ทุกที่นั่ง และ Monitor**, **ประวัติการแก้ไข** (แท็บ Sheet1 ที่ว่างจะถูกลบ)
-6. กด **Deploy > New deployment** > ไอคอนเฟือง เลือก **Web app**
-   - Execute as: **Me**
-   - Who has access: **Anyone**
-7. กด **Deploy** แล้วคัดลอก **Web app URL** (ลงท้ายด้วย `/exec`)
+| ปุ่ม | ผลลัพธ์ |
+|---|---|
+| PREVIEW → ALL PAGES / SUMMARY 4 PAGES | ดูรายงานก่อน EXPORT (สลับแบบได้ในหน้าต่าง PREVIEW) |
+| EXPORT TO PDF ALL PAGES | A4 แนวตั้ง: สรุปตามโซน, Monitor, Galley (FWD / AFT), ห้องน้ำ, ผังทุกโซน, รายการข้อขัดข้อง · ไม่ตัดตารางกลางกลุ่มข้ามหน้า |
+| EXPORT SUMMARY 4 PAGES | A4 แนวนอน: 1 ผังที่นั่ง + ประตู, 2 ข้อขัดข้องที่นั่ง/Monitor, 3 ผัง Galley และห้องน้ำ, 4 ข้อขัดข้อง Galley และห้องน้ำ (หน้าข้อขัดข้องมีเฉพาะเมื่อมีรายการ) |
+| EXPORT TO EXCEL | 5 แผ่นงาน: ผังที่นั่ง (รวม Galley/ห้องน้ำ/ประตู + ตารางสรุป Galley/ห้องน้ำ) · Galley และห้องน้ำ · รวมข้อขัดข้องคงค้าง · ทุกที่นั่ง และ Monitor · ประวัติการแก้ไข |
 
-### 3. เชื่อมหน้าเว็บกับชีท
-แก้ไฟล์ `config.js` ใน GitHub ใส่ URL จากข้อ 2.7:
+PDF ทั้งสองแบบสร้างที่ **600 dpi** (A4 แนวตั้ง 4,488 px ต่อความกว้าง 190 มม. · A4 แนวนอน 6,685 px ต่อ 283 มม.)
+บน iPhone / iPad / Android ระบบลดลงเองตามขนาดภาพสูงสุดที่เครื่องรองรับ
 
-```js
-API_URL: 'https://script.google.com/macros/s/xxxxxxxx/exec',
-```
+ชื่อไฟล์ (เหมือน A320-05 เปลี่ยนเป็น A319):
+- `YYMMDD HHMM TH-LT A319_STATUS_SEAT_PLAN_ALL PAGES.pdf`
+- `YYMMDD HHMM TH-LT A319_STATUS_SEAT_PLAN_SUMMARY_4PAGES.pdf`
+- `YYMMDD HHMM TH-LT A319_STATUS_SEAT_PLAN.xlsx`
 
-กด Commit แล้วรีเฟรชหน้าเว็บ แถบด้านบนจะขึ้น "ข้อมูลจาก Google Sheet"
+(YY = ปี พ.ศ. 2 หลัก เวลาไทย เช่น `691109 2335 TH-LT ...`)
 
-## เมื่อแก้โค้ด Apps Script ภายหลัง
-กด **Deploy > Manage deployments >** ไอคอนดินสอ > Version เลือก **New version** > Deploy
-URL เดิมใช้ต่อได้ ไม่ต้องแก้ `config.js`
+## Google Sheet: Seat Plan 319 (For Admin)
 
-## เมื่อต้องการแก้ผังที่นั่ง
-1. แก้ผังใน `export-excel.js` (ใช้ทั้งชีทและไฟล์ Excel) และ `ZONES` ใน `index.html` (ผังบนหน้าเว็บ) ให้ตรงกัน
-2. รัน `node tools/build-code-gs.js` เพื่อคัดลอกผังเข้า `apps-script/Code.gs`
-3. วาง `Code.gs` ใหม่ใน Apps Script แล้วรัน **setupSheet** อีกครั้ง (หรือเมนู **Seat Plan > สร้าง / จัดผังที่นั่งใหม่** ในชีท) สภาพและหมายเหตุเดิมยังอยู่ แล้ว Deploy เป็น New version
+- หน้าเว็บ: https://rtaf602.github.io/a319_seatplan/
+- `apps-script/Code.gs` = ส่วน API/ชีท + ผังจาก `export-excel.js` + รายการ Galley/ห้องน้ำจาก `index.html` (สร้างด้วย `node tools/build-code-gs.js`)
+- แท็บ: **ผังที่นั่ง** (รวม Galley / ห้องน้ำ / ประตู ขนาดช่องเท่า EXPORT TO EXCEL) · **Galley และห้องน้ำ** · **รวมข้อขัดข้องคงค้าง** (ที่นั่ง/Monitor + Galley/ห้องน้ำ) · **ทุกที่นั่ง และ Monitor** · **ประวัติการแก้ไข**
+- `setupSheet` รันซ้ำได้: อ่านสภาพ/หมายเหตุเดิมจากแท็บ "ทุกที่นั่ง และ Monitor" และ "Galley และห้องน้ำ" ตามชื่อรายการ แล้วเขียนกลับหลังจัดผัง · แท็บประวัติไม่ถูกลบ
+- Galley / ห้องน้ำที่เพิ่งเข้าผังครั้งแรก: ตั้งเป็น **ใช้งานได้** ในชื่อ `INIT_BY` (ร.อ.ธัญขนิต จินตภากร) และลงแท็บประวัติโดยคอลัมน์ "อีเมลผู้แก้ไข" = **ค่าเริ่มต้น** (ไม่นับเป็น SAVE ล่าสุดของหน้าเว็บ)
 
-ห้ามแทรกหรือลบแถว/คอลัมน์ในแท็บ "ผังที่นั่ง" เอง เพราะ Apps Script อ่านตำแหน่งช่องตามผังใน `export-excel.js`
+### อัปเดต Apps Script (ทำทุกครั้งที่ Code.gs เปลี่ยน)
+1. เปิดชีท > ส่วนขยาย > Apps Script > ลบโค้ดเดิมใน `Code.gs` > วางโค้ดจาก `apps-script/Code.gs` > บันทึก
+2. เลือกฟังก์ชัน **setupSheet** > **Run**
+3. **Deploy > Manage deployments >** ดินสอ > Version: **New version** > Deploy (URL เดิม ไม่ต้องแก้ `config.js`)
 
-## การทำงาน
-- หน้าเว็บดึงข้อมูลจากแท็บ "ผังที่นั่ง" ทุก 30 วินาที
-- SAVE: เขียนสภาพที่นั่ง, Monitor และหมายเหตุลงช่องในชีท และเพิ่มประวัติ (ช่องอีเมลจะเป็น "หน้าเว็บ" และช่องผู้ตรวจเป็นชื่อที่ใส่บนเว็บ)
-- กรอกพร้อมกันหลายคน: SAVE จะเขียนเฉพาะช่องที่คนนั้นแก้จริง ถ้าแก้ที่นั่งเดียวกันคนละช่อง ค่าของทั้งสองคนจะอยู่ครบ ถ้าแก้ช่องเดียวกันและมีคน SAVE ไปก่อน หน้าเว็บจะไม่บันทึกทับ แต่ถามคนที่ SAVE ทีหลังว่าจะใช้ค่าที่บันทึกไว้หรือค่าของตัวเอง
-- แก้ในชีทโดยตรง (เลือกจาก dropdown หรือพิมพ์ในช่อง NOTE) ก็บันทึกประวัติเช่นกัน และหน้าเว็บจะเห็นค่าใหม่ในรอบดึงข้อมูลถัดไป
-- ตารางสรุปตามโซนและตามชนิด Monitor ในชีทนับจากแท็บ "ทุกที่นั่ง และ Monitor" จึงเปลี่ยนเองทันที
-- ถ้ายังไม่ได้ใส่ `API_URL` หน้าเว็บยังเปิดดูและแก้ได้ แต่ SAVE ไม่ได้
-
-## ข้อควรรู้ด้านความปลอดภัย
-- Web App ตั้งเป็น "Anyone" เพื่อให้ช่างใช้ได้โดยไม่ต้องล็อกอิน Google ใครที่ได้ URL ก็อ่าน/บันทึกได้ จึงแนะนำให้ตั้ง `WRITE_PIN`
-- เมื่อตั้ง `WRITE_PIN` หน้าเว็บจะถามรหัสทุกครั้งที่เปิดหน้า และทุกครั้งที่กด SAVE โดยไม่จำรหัสไว้ในเครื่อง และ URL ของ Apps Script จะไม่ส่งข้อมูลให้ถ้าไม่มีรหัส
-- Repo นี้เป็น public ห้ามใส่รหัสลงใน `config.js` หรือไฟล์ใดใน repo ให้ตั้งรหัสเฉพาะใน Apps Script
-- ประวัติการแก้ไขอยู่ในชีท ผู้มีสิทธิ์แก้ไขชีทลบได้ ควรล็อกแท็บ "ประวัติการแก้ไข" ด้วย Protect sheet ให้เฉพาะ Admin
+## ทดสอบแล้ว / ยังไม่ได้ทดสอบ
+- ทดสอบแล้ว: หน้าเว็บบนคอมและมือถือ, PREVIEW ทั้งสองแบบ, ลำดับแผ่นงาน Excel, การ merge ช่องในชีท (ไม่มีช่องทับกัน), ขนาดภาพ PDF 600 dpi, ชื่อไฟล์ทั้ง 3 แบบ
+- ทดสอบแล้ว (Apps Script จำลองใน Node): setupSheet เก็บสภาพที่นั่ง/Monitor เดิม, ค่าเริ่มต้น Galley/ห้องน้ำ 43 รายการ, SAVE Galley, รัน setupSheet ซ้ำไม่ลงค่าเริ่มต้นซ้ำ
+- ยังไม่ได้ทดสอบ: เปิดไฟล์ PDF / Excel ที่ export จริง (เครื่องที่ใช้พัฒนาโหลด html2canvas / jsPDF / ExcelJS จาก cdnjs ไม่ได้) — ควรลองกด EXPORT บนเว็บจริงแล้วเปิดไฟล์ตรวจอีกครั้ง

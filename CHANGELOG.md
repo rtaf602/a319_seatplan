@@ -1,0 +1,17 @@
+# CHANGELOG
+
+## 2026-11-09 · ขึ้นใช้งานจริงกับชีท Seat Plan 319
+- Apps Script รองรับ Galley / ห้องน้ำ: ช่องในแท็บผังที่นั่ง, แท็บ "Galley และห้องน้ำ", รวมข้อขัดข้องคงค้างรวม Galley/ห้องน้ำ
+- ค่าเริ่มต้น Galley/ห้องน้ำ 43 รายการ = ใช้งานได้ ในชื่อ ร.อ.ธัญขนิต จินตภากร (แท็บประวัติ: ค่าเริ่มต้น)
+- สภาพที่นั่ง/Monitor ที่บันทึกไว้ไม่เปลี่ยน · ความสูงแถวในชีทล็อกตาม EXPORT TO EXCEL
+- เอาปุ่ม EXPORT TO PDF A4 2PAGE ออก (แทนด้วย EXPORT SUMMARY 4 PAGES)
+
+## 2026-11-09 · ร่างแบบ A319 SEAT MODIFICATION — Galley, ห้องน้ำ และประตู
+- เพิ่ม FWD GALLEY (17 รายการ) และ AFT GALLEY (22 รายการ) ตามคู่มือ A319CJ CAOM 1.02.04 GALLEYS (P3, P5/6)
+- เพิ่มห้องน้ำ 4 ห้อง: LAV A (หน้าห้อง CC 1A), CENTER VIP LAV (ซ้ายมือห้อง CC 6F), LAV C / LAV D (หลังแถวสุดท้าย)
+- เพิ่ม DOOR 1L/1R (หน้าห้อง CC 1A), EMER EXIT L/R (หลังแถว 5), DOOR 4L/4R (ก่อน AFT GALLEY)
+- ปุ่มและรายงานแบบ A320-05: PREVIEW ALL PAGES / SUMMARY 4 PAGES, EXPORT TO PDF ALL PAGES, EXPORT SUMMARY 4 PAGES (600 dpi)
+- ชื่อไฟล์แบบ A320-05: `YYMMDD HHMM TH-LT A319_STATUS_SEAT_PLAN_...`
+- EXPORT TO EXCEL 5 แผ่นงาน: แผ่น "ผังที่นั่ง" มี Galley / ห้องน้ำ / ประตู + ตารางสรุป, เพิ่มแผ่น "Galley และห้องน้ำ"
+- โหมดทดลอง `DEMO` ใน config.js (SAVE เก็บในเบราว์เซอร์ ระหว่างที่ Apps Script ยังไม่รองรับ Galley)
+- ที่นั่ง 39 และ Monitor 21 จอ ไม่เปลี่ยน
