@@ -385,7 +385,7 @@ function setupSheet() {
     sh.getRange('D2').setFormula('=IFERROR(INDEX(FILTER(' + H + 'C2:C,' + H + 'B2:B="หน้าเว็บ"),COUNTIF(' + H + 'B2:B,"หน้าเว็บ")),"-")');
     sh.getRange('N2').setFormula('=LET(t,IFERROR(INDEX(FILTER(' + H + 'A2:A,' + H + 'B2:B="หน้าเว็บ"),COUNTIF(' + H + 'B2:B,"หน้าเว็บ")),""),IF(t="","-",UPPER(TEXT(t,"dd mmm"))&TEXT(t,"yy")&" ("&TEXT(t,"hh:mm")&" TH-LT)"))');
     sh.getRange('N3').setNumberFormat('dd/MM/yyyy HH:mm');
-    sh.getRange('B4').setValue('บันทึกสภาพที่นั่งและ Monitor · สำหรับ Admin ฝ่ายการช่าง และฝ่ายสื่อสาร · เวลาทั้งหมดเป็นเวลาประเทศไทย (TH-LT)');
+    sh.getRange('B4').setValue('บันทึกสภาพที่นั่ง, Monitor, Galley และห้องน้ำ · สำหรับ Admin ฝ่ายการช่าง และฝ่ายสื่อสาร · เวลาทั้งหมดเป็นเวลาประเทศไทย (TH-LT)');
     sh.getRange('C' + HOW_ROW_()).setValue(seatHowTo + ' · ทุกการแก้ไขบันทึกในแท็บ ประวัติการแก้ไข');
     writeState_(sh, keep || {});
 
