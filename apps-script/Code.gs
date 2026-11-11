@@ -32,7 +32,7 @@ const INSPECTOR_CELL = 'D3';   // ช่องชื่อผู้ตรวจ�
 // LOGIN_URL: ที่อยู่ระบบหลังบ้านของระบบ Login (ค่าเดียวกับ backendUrl ในไฟล์ eadmin/docs/assets/config.js)
 //            กรอกในหน้า Apps Script แล้ว Run setup ครั้งเดียว ระบบจำไว้เอง (ช่องนี้ว่างไว้ได้ในโค้ดบน GitHub)
 // WEB_CODE:  รหัสเว็บนี้ในรายชื่อเว็บของหน้า Admin (ต้องตรงกับ webCode ในไฟล์ config.js)
-const LOGIN = { LOGIN_URL: '', WEB_CODE: 'WEB3', CHECK_SEC: 60 };
+const LOGIN = { LOGIN_URL: '', WEB_CODE: 'WEB5', CHECK_SEC: 60 };
 
 const SEAT_TXT = ['ปกติ', 'ขัดข้อง-ใช้ได้', 'ใช้ไม่ได้'];
 const MON_TXT = ['จอปกติ', 'จอเสื่อม', 'จอเสีย'];
