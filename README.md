@@ -1,6 +1,6 @@
 # STATUS SEAT PLAN A319 · Galley, ห้องน้ำ และประตู (ร่างแบบ A319 SEAT MODIFICATION)
 
-หน้าเว็บ STATUS SEAT PLAN A319 (ใช้งานจริง) ที่เพิ่ม **Galley 2 จุด, ห้องน้ำ 4 ห้อง, ประตู และทางออกฉุกเฉิน**
+หน้าเว็บ STATUS SEAT PLAN A319 (ใช้งานจริง) ที่เพิ่ม **Galley 2 จุด, ห้องน้ำ 3 ห้อง, ประตู และทางออกฉุกเฉิน**
 โดยยกระบบมาจาก [`rtaf602/a320-05_seatplan`](https://github.com/rtaf602/a320-05_seatplan) มาใส่ผังของ [`rtaf602/a319_seatplan`](https://github.com/rtaf602/a319_seatplan)
 **ที่นั่ง 39 ที่ และ Monitor 21 จอเหมือนเดิมทุกจุด** (รหัส ตำแหน่ง ชนิดจอ และสีป้ายจอไม่เปลี่ยน)
 
@@ -28,7 +28,7 @@
 | FRONT CREW ZONE | **LAV A** (ซ้าย กว้างเท่าห้อง Commander Center) + **FWD GALLEY** (ขวา แนว D-F) อยู่หน้าสุด → **DOOR 1L / 1R** → ห้อง Commander Center 1A |
 | FIRST CLASS | **EMER EXIT L / R** หลังแถว 5 |
 | MIDDLE CREW ZONE | **CENTER VIP LAV** ซ้ายมือห้อง Commander Center 6F (กว้างและสูงเท่าห้อง) |
-| Y-CLASS | **LAV C** (ซ้าย) / **LAV D** (ขวา) หลังแถวสุดท้าย → **DOOR 4L / 4R** → **AFT GALLEY** (เต็มลำ) |
+| Y-CLASS | **LAV C** (ซ้าย) หลังแถวสุดท้าย → **DOOR 4L / 4R** → **AFT GALLEY** (เต็มลำ) |
 
 - **FWD GALLEY** (คู่มือ A319CJ CAOM 1.02.04 GALLEYS P3) ตรวจ 17 รายการ: KSSU Std Unit 1-2, Oven, Microwave Oven, Coffee Maker, Hot Cup, Work Light, Power Outlet, Stowage, Faucet, Chilled Compartment 1-2, Refrigerator / Freezer, Ice / Cutlery / China Drawer, Chiller
 - **AFT GALLEY** (CAOM 1.02.04 GALLEYS P5/6) ตรวจ 22 รายการ: KSSU Std Unit 1-3, Oven 1-2, Coffee Maker, Hot Jug, Cold Jug, Hot Cup, Faucet, Power Outlet, Stowage 1-3, Misc Stowage, Drawer 1-3, Waste Bin, Trash Compactor, Std FS Trolley 1-2

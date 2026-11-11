@@ -320,8 +320,8 @@
     gapRow(4); wall(3, 8); r--; wall(14, 19); gapRow(4);
     monRow('Y', [['MON-Y5', 'V', 'หน้าที่นั่ง 11A, 11B, 11C'], ['MON-Y6', 'V', 'หน้าที่นั่ง 12D, 12F']]);
     seatRow('Y', '11/12', [['11A', COLS.A], ['11B', COLS.B], ['11C', COLS.C], ['12D', 15], ['12F', 17]]);
-    /* หลังแถวสุดท้าย: LAV C (ซ้าย) / LAV D (ขวา), DOOR 4L / 4R, AFT GALLEY เต็มลำ */
-    gapRow(6); lavRow(['C', 3, 6], ['D', 14, 6]);
+    /* หลังแถวสุดท้าย: LAV C (ซ้าย), DOOR 4L / 4R, AFT GALLEY เต็มลำ (LAV D ตัดออก) */
+    gapRow(6); lavRow(['C', 3, 6], null);
     gapRow(4); doorBand('4'); gapRow(4);
     galleyGrid('AFT', 3, 19);
     zr.Y = [z0, r]; cabin(z0 + 1, r);

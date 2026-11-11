@@ -808,11 +808,10 @@ var GLAYOUT={
   {id:'DRAWER-3',type:'DRAWER',label:'Drawer 3',b:'Drawer 3',p:'D3',c:2,r:7},
   {n:'',c:10,r:7}]}
 };
-/* ห้องน้ำ 4 ห้อง: zone = นับในสรุปห้องน้ำของโซนไหน */
+/* ห้องน้ำ 3 ห้อง (ตัด LAV D ออก): zone = นับในสรุปห้องน้ำของโซนไหน */
 var LAVS={A:{name:'LAVATORY A',short:'LAV A',zone:'F',pos:'หน้าห้อง Commander Center 1A (หน้า DOOR 1L/1R)'},
           CV:{name:'CENTER VIP LAVATORY',short:'CENTER VIP LAV',zone:'C',pos:'ซ้ายมือห้อง Commander Center 6F'},
-          C:{name:'LAVATORY C',short:'LAV C',zone:'Y',pos:'หลังแถวสุดท้าย ฝั่งซ้าย'},
-          D:{name:'LAVATORY D',short:'LAV D',zone:'Y',pos:'หลังแถวสุดท้าย ฝั่งขวา'}};
+          C:{name:'LAVATORY C',short:'LAV C',zone:'Y',pos:'หลังแถวสุดท้าย ฝั่งซ้าย'}};
 function stLabel(it,v){return (it&&it.kind?E_LABEL:S_LABEL)[v|0]}
 return { GLAYOUT: GLAYOUT, GALLEYS: GALLEYS, LAVS: LAVS, TYPES: TYPES, TYPE_ORDER: TYPE_ORDER };
 }
@@ -1141,8 +1140,8 @@ return { GLAYOUT: GLAYOUT, GALLEYS: GALLEYS, LAVS: LAVS, TYPES: TYPES, TYPE_ORDE
     gapRow(4); wall(3, 8); r--; wall(14, 19); gapRow(4);
     monRow('Y', [['MON-Y5', 'V', 'หน้าที่นั่ง 11A, 11B, 11C'], ['MON-Y6', 'V', 'หน้าที่นั่ง 12D, 12F']]);
     seatRow('Y', '11/12', [['11A', COLS.A], ['11B', COLS.B], ['11C', COLS.C], ['12D', 15], ['12F', 17]]);
-    /* หลังแถวสุดท้าย: LAV C (ซ้าย) / LAV D (ขวา), DOOR 4L / 4R, AFT GALLEY เต็มลำ */
-    gapRow(6); lavRow(['C', 3, 6], ['D', 14, 6]);
+    /* หลังแถวสุดท้าย: LAV C (ซ้าย), DOOR 4L / 4R, AFT GALLEY เต็มลำ (LAV D ตัดออก) */
+    gapRow(6); lavRow(['C', 3, 6], null);
     gapRow(4); doorBand('4'); gapRow(4);
     galleyGrid('AFT', 3, 19);
     zr.Y = [z0, r]; cabin(z0 + 1, r);

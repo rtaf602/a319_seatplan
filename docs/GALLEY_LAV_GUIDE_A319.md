@@ -21,7 +21,7 @@
 
 **รหัส (id)** ใช้กติกาเดียวกับ A320-05 ทุกส่วน (เว็บ ↔ Excel ↔ Apps Script)
 - อุปกรณ์ Galley: `<GALLEY>-<CODE>` เช่น `FWD-OVEN-1`, `AFT-TROLLEY-2`, `FWD-DRAWER-1`
-- ห้องน้ำ: `LAV-<KEY>` = `LAV-A`, `LAV-CV`, `LAV-C`, `LAV-D`
+- ห้องน้ำ: `LAV-<KEY>` = `LAV-A`, `LAV-CV`, `LAV-C` (LAV D ตัดออกแล้ว)
 - ชนิด (`kind`): `seat`, `mon`, `eq` (Galley), `lav` (ห้องน้ำ) · รายการทั้งหมดอยู่ใน `docs/ITEM_IDS.csv`
 - สภาพ: ที่นั่ง `S_LABEL`, Monitor `M_LABEL`, Galley/ห้องน้ำ `E_LABEL = ['ใช้งานได้','ใช้งานได้บางส่วน','ใช้งานไม่ได้']` (เก็บในช่อง `s` เหมือนที่นั่ง)
 
@@ -93,8 +93,7 @@ r7 │ S/O* │Drw3 │           │       │       │                │    
 ```js
 var LAVS={A:{name:'LAVATORY A',short:'LAV A',zone:'F',pos:'หน้าห้อง Commander Center 1A (หน้า DOOR 1L/1R)'},
           CV:{name:'CENTER VIP LAVATORY',short:'CENTER VIP LAV',zone:'C',pos:'ซ้ายมือห้อง Commander Center 6F'},
-          C:{name:'LAVATORY C',short:'LAV C',zone:'Y',pos:'หลังแถวสุดท้าย ฝั่งซ้าย'},
-          D:{name:'LAVATORY D',short:'LAV D',zone:'Y',pos:'หลังแถวสุดท้าย ฝั่งขวา'}};
+          C:{name:'LAVATORY C',short:'LAV C',zone:'Y',pos:'หลังแถวสุดท้าย ฝั่งซ้าย'}};
 ```
 `zone` = นับในสรุปห้องน้ำของโซนไหน · `pos` (เพิ่มใหม่) ต่อท้ายชื่อในหน้าต่างบันทึก/รายการข้อขัดข้อง
 
