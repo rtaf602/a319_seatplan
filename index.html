@@ -448,7 +448,7 @@ td small{font-weight:400;color:var(--muted)}
 <div class="wrap" id="app">
   <div class="bar">
     <h1>STATUS SEAT PLAN A319<small>บันทึกสภาพที่นั่ง, Monitor, Galley และห้องน้ำ · ฝ่ายการช่าง / ฝ่ายสื่อสาร</small></h1>
-    <div class="who"><label for="inspector">ชื่อผู้ตรวจ</label><input id="inspector" maxlength="60" readonly tabindex="-1" title="ชื่อ-สกุลของบัญชีที่ Login (ระบบ Login กลาง)" autocomplete="off"><span id="role"></span><button class="btn" id="bOut" type="button">ออกจากระบบ</button></div>
+    <div class="who"><!-- ชื่อผู้ตรวจไม่แสดงบนหน้าแล้ว (ใช้ชื่อ-สกุลจากระบบ Login) · #inspector ยังต้องอยู่: เก็บ me.name ไว้ใช้ตอน SAVE / PREVIEW / ส่งออก --><input id="inspector" type="hidden" readonly tabindex="-1" autocomplete="off"><span id="role"></span><button class="btn" id="bOut" type="button">ออกจากระบบ</button></div>
     <div class="tools">
       <button class="btn" id="bClear" type="button">CLEAR</button>
       <button class="btn" id="bPreview" type="button">PREVIEW</button>
